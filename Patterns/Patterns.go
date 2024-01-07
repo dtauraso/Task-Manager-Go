@@ -207,16 +207,7 @@ func createSequenceOfOperationChangeNames(
 					typeName = fmt.Sprintf("%T", value)
 				}
 			}
-			// update operationNameToNodes
-			// add nodes to sequences and connect them with node ids found in operationNameToNodes
-			// find the sequences the nodes that match with the input are part of
-			// shorter sequences are above longer sequences
-			// sequences of same length are lower than the sequence of items they have in common in relative order
-			// the lower sequence doesn't match all its items with the higher sequence.
-			// lower sequence was entered before the higher sequences and
-			// only has 1 match with n different higher sequences and only 1 of those
-			// sequences has been entered
-			// cound number of nodes in linked list
+
 			temp := Node1{
 				Id:           len(nodes),
 				VariableName: changedVariableName,
@@ -234,6 +225,20 @@ func createSequenceOfOperationChangeNames(
 		lastOperationName = functionName
 	}
 	return nodes
+}
+
+func addSequences(nodes1, nodes2 *[]*Node1) *[]*Node1 {
+	// update operationNameToNodes
+	// add nodes to sequences and connect them with node ids found in operationNameToNodes
+	// find the sequences the nodes that match with the input are part of
+	// shorter sequences are above longer sequences
+	// sequences of same length are lower than the sequence of items they have in common in relative order
+	// the lower sequence doesn't match all its items with the higher sequence.
+	// lower sequence was entered before the higher sequences and
+	// only has 1 match with n different higher sequences and only 1 of those
+	// sequences has been entered
+	// count number of nodes in linked list
+	return nil
 }
 func Pattern() {
 
