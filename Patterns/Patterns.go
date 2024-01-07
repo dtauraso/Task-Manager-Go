@@ -1,4 +1,4 @@
-package patterns
+package Patterns
 
 import (
 	"fmt"
@@ -76,16 +76,6 @@ type Node1 struct {
 	TypeName      string
 	Edges         map[string][]int
 	ParentChildId int
-}
-
-func (n1 *Node1) init(variableName, functionName, typeName string, prev, next, id int) Node1 {
-
-	return Node1{
-		Id:           id,
-		VariableName: variableName,
-		FunctionName: functionName,
-		TypeName:     typeName,
-		Edges:        map[string][]int{"prev": {prev}, "next": {next}}}
 }
 
 type Storage struct {
@@ -192,14 +182,16 @@ var catagoryTracker = map[int]CategoryTracker{}
 // 2) find the connections between new sequece and already existing sequence
 
 func createSequenceOfOperationChangeNames(
-	nodes *[]Node1,
 	v *Variables,
 	c *Caretaker,
-	sequence []string) {
+	sequence []string) []*Node1 {
 	// when the command changes
 	// note what variable values changed
 	// record the changes as a sequence of operation change names
 
+	nodes := []*Node1{}
+	head := -1
+	prev := head
 	lastOperationName := ""
 	for _, functionName := range sequence {
 		functions[functionName].(func(v *Variables, c *Caretaker))(v, c)
@@ -225,14 +217,23 @@ func createSequenceOfOperationChangeNames(
 			// only has 1 match with n different higher sequences and only 1 of those
 			// sequences has been entered
 			// cound number of nodes in linked list
-			*nodes = append(*nodes, Node1{
-				Id:           len(*nodes),
+			temp := Node1{
+				Id:           len(nodes),
 				VariableName: changedVariableName,
 				FunctionName: functionName,
-				TypeName:     typeName})
+				TypeName:     typeName,
+				Edges:        map[string][]int{"prev": {prev}, "next": {}}}
+			if prev >= 0 && prev < len(sequence)-1 {
+				newEdges := nodes[prev].Edges
+				newEdges["next"] = []int{temp.Id}
+				nodes[prev].Edges = newEdges
+			}
+			nodes = append(nodes, &temp)
+			prev = temp.Id
 		}
 		lastOperationName = functionName
 	}
+	return nodes
 }
 func Pattern() {
 
@@ -253,8 +254,7 @@ func Pattern() {
 		mF1UX,
 		mF1UZ,
 		mF1UZ}
-	nodes1 := []Node1{}
-	createSequenceOfOperationChangeNames(&nodes1, &item1, &caretaker1, itemSequence1)
+	nodes1 := createSequenceOfOperationChangeNames(&item1, &caretaker1, itemSequence1)
 	for _, item := range nodes1 {
 		fmt.Printf("%v\n", item)
 	}
@@ -266,10 +266,8 @@ func Pattern() {
 
 	caretaker2 := Caretaker{}
 
-	nodes2 := []Node1{}
-
 	itemSequence2 := []string{mF1UY, mB1UX, mB1UY, mF1UX, mF1UZ}
-	createSequenceOfOperationChangeNames(&nodes2, &item2, &caretaker2, itemSequence2)
+	nodes2 := createSequenceOfOperationChangeNames(&item2, &caretaker2, itemSequence2)
 	for _, item := range nodes2 {
 		fmt.Printf("%v\n", item)
 	}

@@ -1,8 +1,8 @@
 package main
 
-import "Task-Manager-Go/patterns"
+import "Task-Manager-Go/Patterns"
 
 func main() {
 	// Fix the undefined patterns error
-	patterns.Pattern()
+	Patterns.Pattern()
 }
