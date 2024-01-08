@@ -144,29 +144,49 @@ func notEqual(a1, a2 interface{}) bool {
 	return a1 != a2
 }
 
-var operationNameToNodeIds = map[string]map[int]struct{}{
-	mF1UX: {},
-	mF1UY: {},
-	mF1UZ: {},
-	mB1UX: {},
-	mB1UY: {},
-	mB1UZ: {},
+type UniqueOrderedSet struct {
+	itemsMap   map[int]struct{}
+	itemsSlice []int
+}
+
+func NewUniqueOrderedSet() *UniqueOrderedSet {
+	return &UniqueOrderedSet{
+		itemsMap:   make(map[int]struct{}),
+		itemsSlice: []int{},
+	}
+}
+
+func (s *UniqueOrderedSet) Add(item int) {
+	if _, exists := s.itemsMap[item]; !exists {
+		s.itemsMap[item] = struct{}{}
+		s.itemsSlice = append(s.itemsSlice, item)
+	}
+}
+
+var operationNameToNodeIds = map[string]*UniqueOrderedSet{
+	mF1UX: nil,
+	mF1UY: nil,
+	mF1UZ: nil,
+	mB1UX: nil,
+	mB1UY: nil,
+	mB1UZ: nil,
 }
 
 func createSequenceOfOperationChangeNames(
+	nodes *[]*Node1,
 	v *Variables,
 	c *Caretaker,
-	sequence []string) []*Node1 {
+	sequence []string) (id int) {
+
 	// when the command changes
 	// note what variable values changed
 	// record the changes as a sequence of operation change names
 
-	nodes := []*Node1{}
 	head := -1
 	prev := head
 	lastOperationName := ""
 	// {operation name: {node id(s) of occurrence}}
-
+	firstNodeId := len(*nodes)
 	for _, functionName := range sequence {
 		functions[functionName].(func(v *Variables, c *Caretaker))(v, c)
 		if functionName != lastOperationName {
@@ -182,9 +202,14 @@ func createSequenceOfOperationChangeNames(
 				}
 			}
 
-			newNodeId := len(nodes)
+			newNodeId := len(*nodes)
+			if pointer := operationNameToNodeIds[functionName]; pointer == nil {
+				operationNameToNodeIds[functionName] = NewUniqueOrderedSet()
+				operationNameToNodeIds[functionName].Add(newNodeId)
 
-			operationNameToNodeIds[functionName][newNodeId] = struct{}{}
+			} else {
+				operationNameToNodeIds[functionName].Add(newNodeId)
+			}
 			temp := Node1{
 				Id:           newNodeId,
 				VariableName: changedVariableName,
@@ -192,16 +217,16 @@ func createSequenceOfOperationChangeNames(
 				TypeName:     typeName,
 				Edges:        map[string][]int{"prev": {prev}, "next": {}}}
 			if prev >= 0 && prev < len(sequence)-1 {
-				newEdges := nodes[prev].Edges
+				newEdges := (*nodes)[prev].Edges
 				newEdges["next"] = []int{temp.Id}
-				nodes[prev].Edges = newEdges
+				(*nodes)[prev].Edges = newEdges
 			}
-			nodes = append(nodes, &temp)
+			*nodes = append(*nodes, &temp)
 			prev = temp.Id
 		}
 		lastOperationName = functionName
 	}
-	return nodes
+	return firstNodeId
 }
 
 var operations = map[int]Operation{
@@ -233,7 +258,7 @@ var catagoryTracker = map[int]CategoryTracker{}
 // 1) make sequence
 // 2) find the connections between new sequece and already existing sequence
 
-func addSequences(nodes1, nodes2 *[]*Node1) *[]*Node1 {
+func catagorize(nodes *[]*Node1, firstNodeId int) {
 	// update operationNameToNodes
 	// add nodes to sequences and connect them with node ids found in operationNameToNodes
 	// find the sequences the nodes that match with the input are part of
@@ -244,7 +269,7 @@ func addSequences(nodes1, nodes2 *[]*Node1) *[]*Node1 {
 	// only has 1 match with n different higher sequences and only 1 of those
 	// sequences has been entered
 	// count number of nodes in linked list
-	return nil
+
 }
 func Pattern() {
 
@@ -265,26 +290,35 @@ func Pattern() {
 		mF1UX,
 		mF1UZ,
 		mF1UZ}
-	nodes1 := createSequenceOfOperationChangeNames(&item1, &caretaker1, itemSequence1)
-	for _, item := range nodes1 {
-		fmt.Printf("%v\n", item)
-	}
+	nodes := []*Node1{}
 
-	fmt.Printf("\n\n")
+	createSequenceOfOperationChangeNames(&nodes, &item1, &caretaker1, itemSequence1)
+	// fmt.Printf("here\n")
+	// for _, item := range nodes {
+	// 	fmt.Printf("%v\n", item)
+	// }
+
+	// fmt.Printf("\n\n")
 
 	item2 := Variables{State: map[string]interface{}{x: 0, y: 0, z: 0},
 		IfConditionResult: true}
 
 	caretaker2 := Caretaker{}
+	// mF1UY, mB1UX, mB1UY, mF1UX, mF1UZ
+	itemSequence2 := []string{mB1UZ, mB1UX, mF1UY, mB1UX, mF1UX, mB1UY}
+	firstNodeId := createSequenceOfOperationChangeNames(&nodes, &item2, &caretaker2, itemSequence2)
+	// fmt.Printf("\n\n")
 
-	itemSequence2 := []string{mF1UY, mB1UX, mB1UY, mF1UX, mF1UZ}
-	nodes2 := createSequenceOfOperationChangeNames(&item2, &caretaker2, itemSequence2)
-	for _, item := range nodes2 {
+	for _, item := range nodes {
 		fmt.Printf("%v\n", item)
 	}
+	fmt.Printf("\n")
+
 	for operationName, item := range operationNameToNodeIds {
 		fmt.Printf("%v: %v\n", operationName, item)
 	}
+	catagorize(&nodes, firstNodeId)
+
 	// checkFunctions := map[int][]string{}
 	// for _, item := range itemSequence1 {
 	// 	// fmt.Printf("%v. %v, %v\n", item, "check", strings.Contains(item, "check"))
