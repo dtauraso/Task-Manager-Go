@@ -176,6 +176,7 @@ type SequenceHierarchy struct {
 	Sequences                    *[]*Node1
 	FunctionNameToNodeIds        map[string]*UniqueOrderedSet
 	FirstNodeIdLastSequenceAdded int
+	NodeIdsLastSequenceAdded     map[int]struct{}
 }
 
 func (sh *SequenceHierarchy) CreateSequenceOfOperationChangeNames(
@@ -190,6 +191,7 @@ func (sh *SequenceHierarchy) CreateSequenceOfOperationChangeNames(
 	head := -1
 	prev := head
 	lastOperationName := ""
+	sh.NodeIdsLastSequenceAdded = map[int]struct{}{}
 	// {operation name: {node id(s) of occurrence}}
 	sh.FirstNodeIdLastSequenceAdded = len(*sh.Sequences)
 	for _, functionName := range sequence {
@@ -208,6 +210,7 @@ func (sh *SequenceHierarchy) CreateSequenceOfOperationChangeNames(
 			}
 
 			newNodeId := len(*sh.Sequences)
+			sh.NodeIdsLastSequenceAdded[newNodeId] = struct{}{}
 			if pointer := operationNameToNodeIds[functionName]; pointer == nil {
 				operationNameToNodeIds[functionName] = NewUniqueOrderedSet()
 				operationNameToNodeIds[functionName].Add(newNodeId)
@@ -304,14 +307,14 @@ func Pattern() {
 
 	// fmt.Printf("\n\n")
 
-	// item2 := Variables{State: map[string]interface{}{x: 0, y: 0, z: 0},
-	// 	IfConditionResult: true}
+	item2 := Variables{State: map[string]interface{}{x: 0, y: 0, z: 0},
+		IfConditionResult: true}
 
-	// caretaker2 := Caretaker{}
+	caretaker2 := Caretaker{}
 	// mF1UY, mB1UX, mB1UY, mF1UX, mF1UZ
-	// itemSequence2 := []string{mB1UZ, mB1UX, mF1UY, mB1UX, mF1UX, mB1UY}
-	// sh.CreateSequenceOfOperationChangeNames(&item2, &caretaker2, itemSequence2)
-	// // fmt.Printf("\n\n")
+	itemSequence2 := []string{mB1UZ, mB1UX, mF1UY, mB1UX, mF1UX, mB1UY}
+	sh.CreateSequenceOfOperationChangeNames(&item2, &caretaker2, itemSequence2)
+	// fmt.Printf("\n\n")
 
 	for _, item := range *sh.Sequences {
 		fmt.Printf("%v\n", item)
@@ -321,8 +324,13 @@ func Pattern() {
 	for operationName, item := range operationNameToNodeIds {
 		fmt.Printf("%v: %v\n", operationName, item)
 	}
-	// fmt.Printf("%v\n", sh.FirstNodeIdLastSequenceAdded)
-	// categorize(&nodes, firstNodeId)
+	fmt.Printf("%v\n", sh.FirstNodeIdLastSequenceAdded)
+	for nodeIds, _ := range sh.NodeIdsLastSequenceAdded {
+		fmt.Printf("%v, ", nodeIds)
+	}
+	fmt.Printf("\n")
+
+	sh.Categorize()
 
 	// checkFunctions := map[int][]string{}
 	// for _, item := range itemSequence1 {
