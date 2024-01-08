@@ -163,7 +163,7 @@ func (s *UniqueOrderedSet) Add(item int) {
 	}
 }
 
-var operationNameToNodeIds = map[string]*UniqueOrderedSet{
+var operationNameToNodeIds = map[string]*map[int]int{
 	mF1UX: nil,
 	mF1UY: nil,
 	mF1UZ: nil,
@@ -192,12 +192,17 @@ func (sh *SequenceHierarchy) CreateSequenceOfOperationChangeNames(
 	prev := head
 	lastOperationName := ""
 	sh.NodeIdsLastSequenceAdded = map[int]struct{}{}
+	functionNameOccurrenceCounts := map[string]int{}
 	// {operation name: {node id(s) of occurrence}}
 	sh.FirstNodeIdLastSequenceAdded = len(*sh.Sequences)
 	for _, functionName := range sequence {
 		functions[functionName].(func(v *Variables, c *Caretaker))(v, c)
 		if functionName != lastOperationName {
-
+			if _, ok := functionNameOccurrenceCounts[functionName]; !ok {
+				functionNameOccurrenceCounts[functionName] = 1
+			} else {
+				functionNameOccurrenceCounts[functionName] += 1
+			}
 			changedVariableName := ""
 			typeName := ""
 			// likely to be O(1) due to each operation only changing 1 variable at a time
@@ -212,12 +217,10 @@ func (sh *SequenceHierarchy) CreateSequenceOfOperationChangeNames(
 			newNodeId := len(*sh.Sequences)
 			sh.NodeIdsLastSequenceAdded[newNodeId] = struct{}{}
 			if pointer := operationNameToNodeIds[functionName]; pointer == nil {
-				operationNameToNodeIds[functionName] = NewUniqueOrderedSet()
-				operationNameToNodeIds[functionName].Add(newNodeId)
-
-			} else {
-				operationNameToNodeIds[functionName].Add(newNodeId)
+				operationNameToNodeIds[functionName] = &map[int]int{}
 			}
+			(*operationNameToNodeIds[functionName])[newNodeId] = functionNameOccurrenceCounts[functionName]
+
 			temp := Node1{
 				Id:           newNodeId,
 				VariableName: changedVariableName,
