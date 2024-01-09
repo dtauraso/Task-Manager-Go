@@ -226,8 +226,8 @@ func (sh *SequenceHierarchy) CreateSequenceOfOperationChangeNames(
 				VariableName: changedVariableName,
 				FunctionName: functionName,
 				TypeName:     typeName,
-				Edges:        map[string][]int{"prev": {prev}, "next": {}}}
-			if prev >= 0 && prev < len(sequence)-1 {
+				Edges:        map[string][]int{"prev": {prev}, "next": {-1}}}
+			if prev >= 0 {
 				newEdges := (*sh.Sequences)[prev].Edges
 				newEdges["next"] = []int{temp.Id}
 				(*sh.Sequences)[prev].Edges = newEdges
@@ -269,6 +269,11 @@ var catagoryTracker = map[int]CategoryTracker{}
 // 2) find the connections between new sequece and already existing sequence
 
 func (sh *SequenceHierarchy) Categorize() {
+
+	// newSequenceIdTracker := sh.FirstNodeIdLastSequenceAdded
+
+	// for ;newSequenceIdTracker;
+
 	// update operationNameToNodes
 	// add nodes to sequences and connect them with node ids found in operationNameToNodes
 	// find the sequences the nodes that match with the input are part of
