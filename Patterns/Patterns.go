@@ -78,6 +78,10 @@ type Node1 struct {
 	ParentChildId int
 }
 
+func (n1 *Node1) GetLastEdge(edgeName string) int {
+	return n1.Edges[edgeName][len(n1.Edges[edgeName])-1]
+}
+
 type Storage struct {
 	Id           int
 	Node1Id      int
@@ -163,18 +167,9 @@ func (s *UniqueOrderedSet) Add(item int) {
 	}
 }
 
-var operationNameToNodeIds = map[string]*map[int]int{
-	mF1UX: nil,
-	mF1UY: nil,
-	mF1UZ: nil,
-	mB1UX: nil,
-	mB1UY: nil,
-	mB1UZ: nil,
-}
-
 type SequenceHierarchy struct {
 	Sequences                    *[]*Node1
-	FunctionNameToNodeIds        map[string]*UniqueOrderedSet
+	FunctionNameToNodeIds        map[string]*map[int]int
 	FirstNodeIdLastSequenceAdded int
 	NodeIdsLastSequenceAdded     map[int]struct{}
 }
@@ -216,10 +211,10 @@ func (sh *SequenceHierarchy) CreateSequenceOfOperationChangeNames(
 
 			newNodeId := len(*sh.Sequences)
 			sh.NodeIdsLastSequenceAdded[newNodeId] = struct{}{}
-			if pointer := operationNameToNodeIds[functionName]; pointer == nil {
-				operationNameToNodeIds[functionName] = &map[int]int{}
+			if pointer := sh.FunctionNameToNodeIds[functionName]; pointer == nil {
+				sh.FunctionNameToNodeIds[functionName] = &map[int]int{}
 			}
-			(*operationNameToNodeIds[functionName])[newNodeId] = functionNameOccurrenceCounts[functionName]
+			(*sh.FunctionNameToNodeIds[functionName])[newNodeId] = functionNameOccurrenceCounts[functionName]
 
 			temp := Node1{
 				Id:           newNodeId,
@@ -252,6 +247,7 @@ type SequencePair struct {
 	A1 int
 	A2 int
 }
+
 type CategoryTracker struct {
 	IsVisited                bool
 	TotalSequenceLengthFound int
@@ -270,9 +266,28 @@ var catagoryTracker = map[int]CategoryTracker{}
 
 func (sh *SequenceHierarchy) Categorize() {
 
-	// newSequenceIdTracker := sh.FirstNodeIdLastSequenceAdded
+	// trackingDict := map[int]CategoryTracker{}
+	functionNameCurrentOccurrenceCount := map[string]int{}
+	newSequenceIdTracker := sh.FirstNodeIdLastSequenceAdded
 
-	// for ;newSequenceIdTracker;
+	for ; newSequenceIdTracker != -1; newSequenceIdTracker = (*sh.Sequences)[newSequenceIdTracker].GetLastEdge("next") {
+
+		functionNameNewSequence := (*sh.Sequences)[newSequenceIdTracker].FunctionName
+		if _, isOccurrenceRecord := functionNameCurrentOccurrenceCount[functionNameNewSequence]; !isOccurrenceRecord {
+			functionNameCurrentOccurrenceCount[functionNameNewSequence] = 1
+		} else {
+			functionNameCurrentOccurrenceCount[functionNameNewSequence] += 1
+		}
+		nodeIds := sh.FunctionNameToNodeIds[functionNameNewSequence]
+		for nodeId, occurrenceCount := range *nodeIds {
+			if _, isNodeIdInNewSequence := sh.NodeIdsLastSequenceAdded[nodeId]; isNodeIdInNewSequence {
+				continue
+			}
+			if occurrenceCount > functionNameCurrentOccurrenceCount[functionNameNewSequence] {
+				continue
+			}
+		}
+	}
 
 	// update operationNameToNodes
 	// add nodes to sequences and connect them with node ids found in operationNameToNodes
@@ -306,7 +321,14 @@ func Pattern() {
 		mF1UZ,
 		mF1UZ}
 	// nodes := []*Node1{}
-	sh := SequenceHierarchy{Sequences: &[]*Node1{}}
+	sh := SequenceHierarchy{Sequences: &[]*Node1{}, FunctionNameToNodeIds: map[string]*map[int]int{
+		mF1UX: nil,
+		mF1UY: nil,
+		mF1UZ: nil,
+		mB1UX: nil,
+		mB1UY: nil,
+		mB1UZ: nil,
+	}}
 	sh.CreateSequenceOfOperationChangeNames(&item1, &caretaker1, itemSequence1)
 	// fmt.Printf("here\n")
 	// for _, item := range nodes {
@@ -329,7 +351,7 @@ func Pattern() {
 	}
 	fmt.Printf("\n")
 
-	for operationName, item := range operationNameToNodeIds {
+	for operationName, item := range sh.FunctionNameToNodeIds {
 		fmt.Printf("%v: %v\n", operationName, item)
 	}
 	fmt.Printf("%v\n", sh.FirstNodeIdLastSequenceAdded)
