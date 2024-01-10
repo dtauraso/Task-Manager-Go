@@ -434,7 +434,7 @@ func Pattern() {
 
 	caretaker2 := Caretaker{}
 	// mF1UY, mB1UX, mB1UY, mF1UX, mF1UZ
-	itemSequence2 := []string{mB1UZ, mB1UX, mF1UY, mB1UX, mF1UX, mB1UY}
+	itemSequence2 := []string{mB1UZ, mB1UX, mB1UX, mF1UY, mB1UX, mF1UX, mB1UY}
 	sh.CreateSequenceOfOperationChangeNames(&item2, &caretaker2, itemSequence2)
 	// fmt.Printf("\n\n")
 
@@ -462,7 +462,7 @@ func Pattern() {
 		IfConditionResult: true}
 
 	caretaker3 := Caretaker{}
-	itemSequence3 := []string{mF1UX}
+	itemSequence3 := []string{mF1UX, mF1UX, mF1UX}
 	sh.CreateSequenceOfOperationChangeNames(&item3, &caretaker3, itemSequence3)
 
 	for _, item := range *sh.Sequences {
