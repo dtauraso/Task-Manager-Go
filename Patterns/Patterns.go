@@ -457,6 +457,34 @@ func Pattern() {
 		fmt.Printf("%v\n", item)
 	}
 	fmt.Printf("\n")
+
+	item3 := Variables{State: map[string]interface{}{x: 0, y: 0, z: 0},
+		IfConditionResult: true}
+
+	caretaker3 := Caretaker{}
+	itemSequence3 := []string{mF1UX}
+	sh.CreateSequenceOfOperationChangeNames(&item3, &caretaker3, itemSequence3)
+
+	for _, item := range *sh.Sequences {
+		fmt.Printf("%v\n", item)
+	}
+	fmt.Printf("\n")
+
+	for operationName, item := range sh.FunctionNameToNodeIds {
+		fmt.Printf("%v: %v\n", operationName, item)
+	}
+	fmt.Printf("%v\n", sh.FirstNodeIdLastSequenceAdded)
+	for nodeIds, _ := range sh.NodeIdsLastSequenceAdded {
+		fmt.Printf("%v, ", nodeIds)
+	}
+	fmt.Printf("\n")
+
+	sh.Categorize()
+	for _, item := range *sh.Sequences {
+		fmt.Printf("%v\n", item)
+	}
+	fmt.Printf("\n")
+
 	// checkFunctions := map[int][]string{}
 	// for _, item := range itemSequence1 {
 	// 	// fmt.Printf("%v. %v, %v\n", item, "check", strings.Contains(item, "check"))
