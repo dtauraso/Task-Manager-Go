@@ -10,11 +10,11 @@ const (
 	z = "z"
 )
 
-func add1(x int) int {
+func add(x int) int {
 	return x + 1
 }
 
-func subtract1(x int) int {
+func subtract(x int) int {
 	return x - 1
 }
 
@@ -30,12 +30,12 @@ func move1Unit(v *Variables, c *Caretaker, dimensionName string, direction func(
 	v.State[dimensionName] = dimension
 
 }
-func moveForward1UnitX(v *Variables, c *Caretaker)  { move1Unit(v, c, x, add1) }
-func moveForward1UnitY(v *Variables, c *Caretaker)  { move1Unit(v, c, y, add1) }
-func moveForward1UnitZ(v *Variables, c *Caretaker)  { move1Unit(v, c, z, add1) }
-func moveBackward1UnitX(v *Variables, c *Caretaker) { move1Unit(v, c, x, subtract1) }
-func moveBackward1UnitY(v *Variables, c *Caretaker) { move1Unit(v, c, y, subtract1) }
-func moveBackward1UnitZ(v *Variables, c *Caretaker) { move1Unit(v, c, z, subtract1) }
+func moveForward1UnitX(v *Variables, c *Caretaker)  { move1Unit(v, c, x, add) }
+func moveForward1UnitY(v *Variables, c *Caretaker)  { move1Unit(v, c, y, add) }
+func moveForward1UnitZ(v *Variables, c *Caretaker)  { move1Unit(v, c, z, add) }
+func moveBackward1UnitX(v *Variables, c *Caretaker) { move1Unit(v, c, x, subtract) }
+func moveBackward1UnitY(v *Variables, c *Caretaker) { move1Unit(v, c, y, subtract) }
+func moveBackward1UnitZ(v *Variables, c *Caretaker) { move1Unit(v, c, z, subtract) }
 
 type Operation struct {
 	Id           int
