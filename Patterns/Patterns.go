@@ -49,7 +49,7 @@ func subtract1(x int) int {
 
 func move1Unit(v *Variables, c *Caretaker, dimensionName string, direction func(int) int) {
 
-	c.UpdateMemento(v.CreateMemento())
+	c.UpdateMemento(v.StructInstanceName, v.CreateMemento())
 	dimension := v.State[dimensionName].(int)
 	dimension = direction(dimension)
 	v.State[dimensionName] = dimension
@@ -88,8 +88,8 @@ type Storage struct {
 	StreakLength int
 }
 type Variables struct {
-	State             map[string]interface{}
-	IfConditionResult bool
+	State              map[string]interface{}
+	StructInstanceName string
 }
 
 func (v *Variables) CreateMemento() Memento {
@@ -109,17 +109,29 @@ type Memento struct {
 }
 
 type Caretaker struct {
-	memento Memento
+	memento     map[string][]Memento
+	smallMemory bool
+}
+
+func (c *Caretaker) InitMemento(variableName string) {
+	if c.memento == nil {
+		c.memento = map[string][]Memento{}
+	}
+	c.memento[variableName] = []Memento{}
 }
 
 // {sequenceVarName: Memento} of mementos for each sequence to process
-func (c *Caretaker) UpdateMemento(m Memento) {
-	c.memento = m
+func (c *Caretaker) UpdateMemento(variableName string, m Memento) {
+
+	if _, ok := c.memento[variableName]; !ok {
+		c.InitMemento(variableName)
+	}
+	c.memento[variableName] = append(c.memento[variableName], m)
 
 }
 
-func (c *Caretaker) GetMemento() Memento {
-	return c.memento
+func (c *Caretaker) GetLastMemento(variableName string) Memento {
+	return c.memento[variableName][len(c.memento)-1]
 }
 
 const (
@@ -202,7 +214,7 @@ func (sh *SequenceHierarchy) CreateSequenceOfOperationChangeNames(
 			typeName := ""
 			// likely to be O(1) due to each operation only changing 1 variable at a time
 			for variableName, value := range v.State {
-				prevValue := c.GetMemento().State[variableName]
+				prevValue := c.GetLastMemento(v.StructInstanceName).State[variableName]
 				if value != prevValue {
 					changedVariableName = variableName
 					typeName = fmt.Sprintf("%T", value)
@@ -396,7 +408,7 @@ func (sh *SequenceHierarchy) Categorize() {
 func Pattern() {
 
 	item1 := Variables{State: map[string]interface{}{x: 0, y: 0, z: 0},
-		IfConditionResult: true}
+		StructInstanceName: "item1"}
 	if !R3Test(&item1) {
 		return
 	}
@@ -430,7 +442,7 @@ func Pattern() {
 	// fmt.Printf("\n\n")
 
 	item2 := Variables{State: map[string]interface{}{x: 0, y: 0, z: 0},
-		IfConditionResult: true}
+		StructInstanceName: "item2"}
 
 	caretaker2 := Caretaker{}
 	// mF1UY, mB1UX, mB1UY, mF1UX, mF1UZ
@@ -459,7 +471,7 @@ func Pattern() {
 	fmt.Printf("\n")
 
 	item3 := Variables{State: map[string]interface{}{x: 0, y: 0, z: 0},
-		IfConditionResult: true}
+		StructInstanceName: "item3"}
 
 	caretaker3 := Caretaker{}
 	itemSequence3 := []string{mF1UX, mF1UX, mF1UX}
