@@ -109,8 +109,8 @@ type Memento struct {
 }
 
 type Caretaker struct {
-	memento     map[string][]Memento
-	smallMemory bool
+	memento       map[string][]Memento
+	keepLastEntry bool
 }
 
 func (c *Caretaker) InitMemento(variableName string) {
@@ -126,12 +126,22 @@ func (c *Caretaker) UpdateMemento(variableName string, m Memento) {
 	if _, ok := c.memento[variableName]; !ok {
 		c.InitMemento(variableName)
 	}
-	c.memento[variableName] = append(c.memento[variableName], m)
 
+	c.memento[variableName] = append(c.memento[variableName], m)
+	if c.keepLastEntry {
+		c.memento[variableName] = c.memento[variableName][len(c.memento[variableName])-1 : len(c.memento[variableName])]
+	}
 }
 
 func (c *Caretaker) GetLastMemento(variableName string) Memento {
-	return c.memento[variableName][len(c.memento)-1]
+	if _, ok := c.memento[variableName]; !ok {
+		return Memento{}
+	}
+	if len(c.memento[variableName]) == 0 {
+		return Memento{}
+
+	}
+	return c.memento[variableName][len(c.memento[variableName])-1]
 }
 
 const (
@@ -412,7 +422,7 @@ func Pattern() {
 	if !R3Test(&item1) {
 		return
 	}
-	caretaker1 := Caretaker{}
+	caretaker := Caretaker{keepLastEntry: true}
 	itemSequence1 := []string{
 		mF1UY,
 		mF1UY,
@@ -433,7 +443,7 @@ func Pattern() {
 		mB1UY: nil,
 		mB1UZ: nil,
 	}}
-	sh.CreateSequenceOfOperationChangeNames(&item1, &caretaker1, itemSequence1)
+	sh.CreateSequenceOfOperationChangeNames(&item1, &caretaker, itemSequence1)
 	// fmt.Printf("here\n")
 	// for _, item := range nodes {
 	// 	fmt.Printf("%v\n", item)
@@ -444,10 +454,9 @@ func Pattern() {
 	item2 := Variables{State: map[string]interface{}{x: 0, y: 0, z: 0},
 		StructInstanceName: "item2"}
 
-	caretaker2 := Caretaker{}
 	// mF1UY, mB1UX, mB1UY, mF1UX, mF1UZ
 	itemSequence2 := []string{mB1UZ, mB1UX, mB1UX, mF1UY, mB1UX, mF1UX, mB1UY}
-	sh.CreateSequenceOfOperationChangeNames(&item2, &caretaker2, itemSequence2)
+	sh.CreateSequenceOfOperationChangeNames(&item2, &caretaker, itemSequence2)
 	// fmt.Printf("\n\n")
 
 	for _, item := range *sh.Sequences {
@@ -473,9 +482,8 @@ func Pattern() {
 	item3 := Variables{State: map[string]interface{}{x: 0, y: 0, z: 0},
 		StructInstanceName: "item3"}
 
-	caretaker3 := Caretaker{}
 	itemSequence3 := []string{mF1UX, mF1UX, mF1UX}
-	sh.CreateSequenceOfOperationChangeNames(&item3, &caretaker3, itemSequence3)
+	sh.CreateSequenceOfOperationChangeNames(&item3, &caretaker, itemSequence3)
 
 	for _, item := range *sh.Sequences {
 		fmt.Printf("%v\n", item)
@@ -497,6 +505,8 @@ func Pattern() {
 	}
 	fmt.Printf("\n")
 
+	fmt.Printf("%v\n", caretaker.memento)
+	// fmt.Printf("%v\n", caretaker)
 	// checkFunctions := map[int][]string{}
 	// for _, item := range itemSequence1 {
 	// 	// fmt.Printf("%v. %v, %v\n", item, "check", strings.Contains(item, "check"))
