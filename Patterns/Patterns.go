@@ -10,35 +10,6 @@ const (
 	z = "z"
 )
 
-func R3Test(v *Variables) bool {
-
-	x, okX := v.State[x]
-
-	y, okY := v.State[y]
-
-	z, okZ := v.State[z]
-
-	if !okX {
-		return false
-	}
-	if _, okXInt := x.(int); !okXInt {
-		return false
-	}
-	if !okY {
-		return false
-	}
-	if _, okYInt := y.(int); !okYInt {
-		return false
-	}
-	if !okZ {
-		return false
-	}
-	if _, okZInt := z.(int); !okZInt {
-		return false
-	}
-	return true
-}
-
 func add1(x int) int {
 	return x + 1
 }
@@ -50,6 +21,10 @@ func subtract1(x int) int {
 func move1Unit(v *Variables, c *Caretaker, dimensionName string, direction func(int) int) {
 
 	c.UpdateMemento(v.StructInstanceName, v.CreateMemento())
+
+	if _, ok := v.State[dimensionName].(int); !ok {
+		return
+	}
 	dimension := v.State[dimensionName].(int)
 	dimension = direction(dimension)
 	v.State[dimensionName] = dimension
@@ -419,9 +394,7 @@ func Pattern() {
 
 	item1 := Variables{State: map[string]interface{}{x: 0, y: 0, z: 0},
 		StructInstanceName: "item1"}
-	if !R3Test(&item1) {
-		return
-	}
+
 	caretaker := Caretaker{keepLastEntry: true}
 	itemSequence1 := []string{
 		mF1UY,
