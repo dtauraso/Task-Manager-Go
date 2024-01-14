@@ -4,48 +4,8 @@ import (
 	"fmt"
 )
 
-const (
-	x = "x"
-	y = "y"
-	z = "z"
-)
-
-func add(x int) int {
-	return x + 1
-}
-
-func subtract(x int) int {
-	return x - 1
-}
-
-func move1Unit(v *Variables, c *Caretaker, dimensionName string, direction func(int) int) {
-
-	c.UpdateMemento(v.StructInstanceName, v.CreateMemento())
-
-	if _, ok := v.State[dimensionName].(int); !ok {
-		return
-	}
-	dimension := v.State[dimensionName].(int)
-	dimension = direction(dimension)
-	v.State[dimensionName] = dimension
-
-}
-func moveForward1UnitX(v *Variables, c *Caretaker)  { move1Unit(v, c, x, add) }
-func moveForward1UnitY(v *Variables, c *Caretaker)  { move1Unit(v, c, y, add) }
-func moveForward1UnitZ(v *Variables, c *Caretaker)  { move1Unit(v, c, z, add) }
-func moveBackward1UnitX(v *Variables, c *Caretaker) { move1Unit(v, c, x, subtract) }
-func moveBackward1UnitY(v *Variables, c *Caretaker) { move1Unit(v, c, y, subtract) }
-func moveBackward1UnitZ(v *Variables, c *Caretaker) { move1Unit(v, c, z, subtract) }
-
-type Operation struct {
-	Id           int
-	VariableName string
-	FunctionName string
-	TypeName     string
-}
 type Node1 struct {
-	Id int
-	// OperationId   int
+	Id            int
 	VariableName  string
 	FunctionName  string
 	TypeName      string
@@ -55,68 +15,6 @@ type Node1 struct {
 
 func (n1 *Node1) GetLastEdge(edgeName string) int {
 	return n1.Edges[edgeName][len(n1.Edges[edgeName])-1]
-}
-
-type Storage struct {
-	Id           int
-	Node1Id      int
-	StreakLength int
-}
-type Variables struct {
-	State              map[string]interface{}
-	StructInstanceName string
-}
-
-func (v *Variables) CreateMemento() Memento {
-	memento := map[string]interface{}{}
-
-	for key, value := range v.State {
-		memento[key] = value
-	}
-	return Memento{State: memento}
-}
-func (v *Variables) SetMemento(m Memento) {
-	v.State = m.State
-}
-
-type Memento struct {
-	State map[string]interface{}
-}
-
-type Caretaker struct {
-	memento       map[string][]Memento
-	keepLastEntry bool
-}
-
-func (c *Caretaker) InitMemento(variableName string) {
-	if c.memento == nil {
-		c.memento = map[string][]Memento{}
-	}
-	c.memento[variableName] = []Memento{}
-}
-
-// {sequenceVarName: Memento} of mementos for each sequence to process
-func (c *Caretaker) UpdateMemento(variableName string, m Memento) {
-
-	if _, ok := c.memento[variableName]; !ok {
-		c.InitMemento(variableName)
-	}
-
-	c.memento[variableName] = append(c.memento[variableName], m)
-	if c.keepLastEntry {
-		c.memento[variableName] = c.memento[variableName][len(c.memento[variableName])-1 : len(c.memento[variableName])]
-	}
-}
-
-func (c *Caretaker) GetLastMemento(variableName string) Memento {
-	if _, ok := c.memento[variableName]; !ok {
-		return Memento{}
-	}
-	if len(c.memento[variableName]) == 0 {
-		return Memento{}
-
-	}
-	return c.memento[variableName][len(c.memento[variableName])-1]
 }
 
 const (
@@ -231,13 +129,6 @@ func (sh *SequenceHierarchy) CreateSequenceOfOperationChangeNames(
 	}
 }
 
-var operations = map[int]Operation{
-	0: {VariableName: "x", FunctionName: mF1UX, TypeName: "int"},
-	1: {VariableName: "x", FunctionName: mB1UX, TypeName: "int"},
-	2: {VariableName: "y", FunctionName: mF1UY, TypeName: "int"},
-	3: {VariableName: "y", FunctionName: mB1UY, TypeName: "int"},
-	4: {VariableName: "z", FunctionName: mF1UZ, TypeName: "int"},
-	5: {VariableName: "z", FunctionName: mB1UZ, TypeName: "int"}}
 var sequences = []Node1{}
 
 type SequencePair struct {
