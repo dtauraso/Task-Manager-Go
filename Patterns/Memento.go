@@ -1,5 +1,6 @@
 package Patterns
 
+// generic object struct
 type Variables struct {
 	State              map[string]interface{}
 	StructInstanceName string
@@ -33,7 +34,6 @@ func (c *Caretaker) InitMemento(variableName string) {
 	c.memento[variableName] = []Memento{}
 }
 
-// {sequenceVarName: Memento} of mementos for each sequence to process
 func (c *Caretaker) UpdateMemento(variableName string, m Memento) {
 
 	if _, ok := c.memento[variableName]; !ok {
@@ -41,6 +41,8 @@ func (c *Caretaker) UpdateMemento(variableName string, m Memento) {
 	}
 
 	c.memento[variableName] = append(c.memento[variableName], m)
+
+	// prevent entire history of variable changes to be saved
 	if c.keepLastEntry {
 		c.memento[variableName] = c.memento[variableName][len(c.memento[variableName])-1 : len(c.memento[variableName])]
 	}

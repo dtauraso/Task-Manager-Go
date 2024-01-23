@@ -69,6 +69,13 @@ type SequenceHierarchy struct {
 	NodeIdsLastSequenceAdded     map[int]struct{}
 }
 
+type Node struct {
+}
+type SequenceBlock struct {
+}
+type SequenceHierarchy2 struct {
+}
+
 func (sh *SequenceHierarchy) CreateSequenceOfOperationChangeNames(
 	v *Variables,
 	c *Caretaker,
@@ -77,6 +84,7 @@ func (sh *SequenceHierarchy) CreateSequenceOfOperationChangeNames(
 	// when the command changes
 	// note what variable values changed
 	// record the changes as a sequence of operation change names
+	// insert comparison function that verifies the operation change happened.
 
 	head := -1
 	prev := head
