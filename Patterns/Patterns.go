@@ -85,6 +85,7 @@ func (sh *SequenceHierarchy) CreateSequenceOfOperationChangeNames(
 	// note what variable values changed
 	// record the changes as a sequence of operation change names
 	// insert comparison function that verifies the operation change happened.
+	// record check functions
 
 	head := -1
 	prev := head
