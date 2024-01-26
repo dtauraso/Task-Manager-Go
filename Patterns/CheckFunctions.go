@@ -4,6 +4,8 @@ import "reflect"
 
 func checkAddSubtractChange(v *Variables, c *Caretaker) bool {
 
+	// assume 1 variable changed by +1 or -1
+
 	if _, ok := v.State[variableName].(int); !ok {
 		return false
 	}
