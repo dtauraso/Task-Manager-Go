@@ -1,0 +1,2 @@
+last match from search that has a start of path set to true is start of path
+    there should only be 1 match with start of path set to true

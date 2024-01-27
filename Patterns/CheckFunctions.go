@@ -1,22 +1,32 @@
 package Patterns
 
-import "reflect"
+import (
+	"reflect"
+)
 
 func checkAddSubtractChange(v *Variables, c *Caretaker, arithmaticFunction func(int) int) bool {
 
 	// assume 1 variable changed by +1 or -1
 
-	if _, ok := v.State[variableName].(int); !ok {
+	changedVariableName := ""
+
+	for variableName, value := range v.State {
+		prevValue := c.GetLastMemento(v.StructInstanceName).State[variableName]
+		if value != prevValue {
+			changedVariableName = variableName
+		}
+	}
+	if _, ok := v.State[changedVariableName].(int); !ok {
 		return false
 	}
 	var variablePrev int
-	memento := c.GetLastMemento(variableName)
+	memento := c.GetLastMemento(changedVariableName)
 	if reflect.DeepEqual(memento, Memento{}) {
 		variablePrev = 0
 	} else {
-		variablePrev = memento.State[variableName].(int)
+		variablePrev = memento.State[changedVariableName].(int)
 	}
-	variable := v.State[variableName].(int)
+	variable := v.State[changedVariableName].(int)
 	return variable == arithmaticFunction(variablePrev)
 
 }
