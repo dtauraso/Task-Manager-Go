@@ -6,6 +6,7 @@ import (
 
 type Node1 struct {
 	Id            int
+	SequenceId    int
 	VariableName  string
 	FunctionName  string
 	TypeName      string
@@ -67,13 +68,8 @@ type SequenceHierarchy struct {
 	FunctionNameToNodeIds        map[string]*map[int]int
 	FirstNodeIdLastSequenceAdded int
 	NodeIdsLastSequenceAdded     map[int]struct{}
-}
-
-type Node struct {
-}
-type SequenceBlock struct {
-}
-type SequenceHierarchy2 struct {
+	maxSequenceId                int
+	sequenceIdLength             map[int]int
 }
 
 func (sh *SequenceHierarchy) CreateSequenceOfOperationChangeNames(
