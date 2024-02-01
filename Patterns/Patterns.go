@@ -5,13 +5,13 @@ import (
 )
 
 type Node1 struct {
-	Id            int
-	SequenceId    int
-	VariableName  string
-	FunctionName  string
-	TypeName      string
-	Edges         map[string][]int
-	ParentChildId int
+	Id             int
+	SequenceLength int
+	VariableName   string
+	FunctionName   string
+	TypeName       string
+	Edges          map[string][]int
+	ParentChildId  int
 }
 
 func (n1 *Node1) GetLastEdge(edgeName string) int {
@@ -25,6 +25,8 @@ const (
 	mB1UX = "moveBackward1UnitX"
 	mB1UY = "moveBackward1UnitY"
 	mB1UZ = "moveBackward1UnitZ"
+	cAC   = "checkAddChange"
+	cSC   = "checkSubtractChange"
 )
 
 var functions = map[string]interface{}{
@@ -34,6 +36,14 @@ var functions = map[string]interface{}{
 	mB1UX: moveBackward1UnitX,
 	mB1UY: moveBackward1UnitY,
 	mB1UZ: moveBackward1UnitZ,
+}
+var functionNameMapCheckFunctionName = map[string]string{
+	mF1UX: cAC,
+	mF1UY: cAC,
+	mF1UZ: cAC,
+	mB1UX: cSC,
+	mB1UY: cSC,
+	mB1UZ: cSC,
 }
 
 func equal(a1, a2 interface{}) bool {
@@ -68,8 +78,64 @@ type SequenceHierarchy struct {
 	FunctionNameToNodeIds        map[string]*map[int]int
 	FirstNodeIdLastSequenceAdded int
 	NodeIdsLastSequenceAdded     map[int]struct{}
-	maxSequenceId                int
-	sequenceIdLength             map[int]int
+}
+
+func (sh *SequenceHierarchy) CreateSequenceOfCheckFunctionNames(
+	v *Variables,
+	c *Caretaker,
+	sequence []string) (Sequence *[]*Node1) {
+
+	head := -1
+	prev := head
+	lastOperationName := ""
+	sh.NodeIdsLastSequenceAdded = map[int]struct{}{}
+	functionNameOccurrenceCounts := map[string]int{}
+
+	sh.FirstNodeIdLastSequenceAdded = len(*sh.Sequences)
+	for _, functionName := range sequence {
+		functions[functionName].(func(v *Variables, c *Caretaker))(v, c)
+		if functionName != lastOperationName {
+			if _, ok := functionNameOccurrenceCounts[functionName]; !ok {
+				functionNameOccurrenceCounts[functionName] = 1
+			} else {
+				functionNameOccurrenceCounts[functionName] += 1
+			}
+			changedVariableName := ""
+			typeName := ""
+			// likely to be O(1) due to each operation only changing 1 variable at a time
+			for variableName, value := range v.State {
+				prevValue := c.GetLastMemento(v.StructInstanceName).State[variableName]
+				if value != prevValue {
+					changedVariableName = variableName
+					typeName = fmt.Sprintf("%T", value)
+				}
+			}
+
+			newNodeId := len(*sh.Sequences)
+			sh.NodeIdsLastSequenceAdded[newNodeId] = struct{}{}
+			if pointer := sh.FunctionNameToNodeIds[functionName]; pointer == nil {
+				sh.FunctionNameToNodeIds[functionName] = &map[int]int{}
+			}
+			(*sh.FunctionNameToNodeIds[functionName])[newNodeId] = functionNameOccurrenceCounts[functionName]
+
+			temp := Node1{
+				Id:           newNodeId,
+				VariableName: changedVariableName,
+				FunctionName: functionName,
+				TypeName:     typeName,
+				Edges:        map[string][]int{"prev": {prev}, "next": {-1}}}
+			if prev >= 0 {
+				newEdges := (*sh.Sequences)[prev].Edges
+				newEdges["next"] = []int{temp.Id}
+				(*sh.Sequences)[prev].Edges = newEdges
+			}
+			*sh.Sequences = append(*sh.Sequences, &temp)
+			prev = temp.Id
+		}
+		lastOperationName = functionName
+	}
+
+	return nil
 }
 
 func (sh *SequenceHierarchy) CreateSequenceOfOperationChangeNames(
@@ -82,6 +148,7 @@ func (sh *SequenceHierarchy) CreateSequenceOfOperationChangeNames(
 	// record the changes as a sequence of operation change names
 	// insert comparison function that verifies the operation change happened.
 	// record check functions
+	// need to keep sequence separate till know how it connects to saved sequences
 
 	head := -1
 	prev := head
