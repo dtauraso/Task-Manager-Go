@@ -83,23 +83,17 @@ type SequenceHierarchy struct {
 func (sh *SequenceHierarchy) CreateSequenceOfCheckFunctionNames(
 	v *Variables,
 	c *Caretaker,
-	sequence []string) (Sequence *[]*Node1) {
+	sequence []string) *[]*Node1 {
 
 	head := -1
 	prev := head
 	lastOperationName := ""
-	sh.NodeIdsLastSequenceAdded = map[int]struct{}{}
-	functionNameOccurrenceCounts := map[string]int{}
-
+	Sequence := &[]*Node1{}
 	sh.FirstNodeIdLastSequenceAdded = len(*sh.Sequences)
 	for _, functionName := range sequence {
 		functions[functionName].(func(v *Variables, c *Caretaker))(v, c)
 		if functionName != lastOperationName {
-			if _, ok := functionNameOccurrenceCounts[functionName]; !ok {
-				functionNameOccurrenceCounts[functionName] = 1
-			} else {
-				functionNameOccurrenceCounts[functionName] += 1
-			}
+
 			changedVariableName := ""
 			typeName := ""
 			// likely to be O(1) due to each operation only changing 1 variable at a time
@@ -111,31 +105,26 @@ func (sh *SequenceHierarchy) CreateSequenceOfCheckFunctionNames(
 				}
 			}
 
-			newNodeId := len(*sh.Sequences)
-			sh.NodeIdsLastSequenceAdded[newNodeId] = struct{}{}
-			if pointer := sh.FunctionNameToNodeIds[functionName]; pointer == nil {
-				sh.FunctionNameToNodeIds[functionName] = &map[int]int{}
-			}
-			(*sh.FunctionNameToNodeIds[functionName])[newNodeId] = functionNameOccurrenceCounts[functionName]
+			newNodeId := len(*Sequence)
 
 			temp := Node1{
 				Id:           newNodeId,
 				VariableName: changedVariableName,
-				FunctionName: functionName,
+				FunctionName: functionNameMapCheckFunctionName[functionName],
 				TypeName:     typeName,
 				Edges:        map[string][]int{"prev": {prev}, "next": {-1}}}
 			if prev >= 0 {
-				newEdges := (*sh.Sequences)[prev].Edges
+				newEdges := (*Sequence)[prev].Edges
 				newEdges["next"] = []int{temp.Id}
-				(*sh.Sequences)[prev].Edges = newEdges
+				(*Sequence)[prev].Edges = newEdges
 			}
-			*sh.Sequences = append(*sh.Sequences, &temp)
+			*Sequence = append(*Sequence, &temp)
 			prev = temp.Id
 		}
 		lastOperationName = functionName
 	}
 
-	return nil
+	return Sequence
 }
 
 func (sh *SequenceHierarchy) CreateSequenceOfOperationChangeNames(
@@ -379,6 +368,13 @@ func Pattern() {
 		mB1UY: nil,
 		mB1UZ: nil,
 	}}
+	Sequence := sh.CreateSequenceOfCheckFunctionNames(&item1, &caretaker, itemSequence1)
+	fmt.Printf("check function sequence\n")
+	for _, item := range *Sequence {
+		fmt.Printf("%v\n", item)
+	}
+	fmt.Printf("\n")
+	return
 	sh.CreateSequenceOfOperationChangeNames(&item1, &caretaker, itemSequence1)
 	// fmt.Printf("here\n")
 	// for _, item := range nodes {
