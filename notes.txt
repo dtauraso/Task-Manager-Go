@@ -1,2 +1,3 @@
 last match from search that has a start of path set to true is start of path
-    there should only be 1 match with start of path set to true
+    the match sequence needs to be unique has it's last matching node with start of path set to true and
+    the id of the first node to start compute path
