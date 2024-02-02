@@ -23,8 +23,7 @@ type Memento struct {
 }
 
 type Caretaker struct {
-	memento       map[string][]Memento
-	keepLastEntry bool
+	memento map[string][]Memento
 }
 
 func (c *Caretaker) InitMemento(variableName string) {
@@ -39,13 +38,7 @@ func (c *Caretaker) UpdateMemento(variableName string, m Memento) {
 	if _, ok := c.memento[variableName]; !ok {
 		c.InitMemento(variableName)
 	}
-
 	c.memento[variableName] = append(c.memento[variableName], m)
-
-	// prevent entire history of variable changes to be saved
-	if c.keepLastEntry {
-		c.memento[variableName] = c.memento[variableName][len(c.memento[variableName])-1 : len(c.memento[variableName])]
-	}
 }
 
 func (c *Caretaker) GetLastMemento(variableName string) Memento {

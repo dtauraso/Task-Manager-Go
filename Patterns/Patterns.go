@@ -74,8 +74,10 @@ func (s *UniqueOrderedSet) Add(item int) {
 }
 
 type SequenceHierarchy struct {
-	Sequences                    *[]*Node1
-	FunctionNameToNodeIds        map[string]*map[int]int
+	Sequences              *[]*Node1
+	FunctionNameToNodeIds  map[string]*map[int]int
+	FunctionNameToNodeIds2 map[string]*map[int]struct{}
+
 	FirstNodeIdLastSequenceAdded int
 	NodeIdsLastSequenceAdded     map[int]struct{}
 }
@@ -213,6 +215,135 @@ var catagoryTracker = map[int]CategoryTracker{}
 // 1) make sequence
 // 2) find the connections between new sequece and already existing sequence
 
+func (sh *SequenceHierarchy) Categorize2(newSequence *[]*Node1) {
+
+	// trackingDict := map[int]CategoryTracker{}
+	nodeIdMatches := map[int]int{}
+	functionNameCurrentOccurrenceCount := map[string]int{}
+	newSequenceIdTracker := sh.FirstNodeIdLastSequenceAdded
+	sizeOfNewSequence := 0
+	for ; newSequenceIdTracker != -1; newSequenceIdTracker = (*sh.Sequences)[newSequenceIdTracker].GetLastEdge("next") {
+
+		functionNameNewSequence := (*sh.Sequences)[newSequenceIdTracker].FunctionName
+		// prevents 1 occurrence from connecting to more than 1 occurrences in previously saved sequences
+		if _, isOccurrenceRecord := functionNameCurrentOccurrenceCount[functionNameNewSequence]; !isOccurrenceRecord {
+			functionNameCurrentOccurrenceCount[functionNameNewSequence] = 1
+		} else {
+			functionNameCurrentOccurrenceCount[functionNameNewSequence] += 1
+		}
+		nodeIds := sh.FunctionNameToNodeIds[functionNameNewSequence]
+		for nodeId, occurrenceCount := range *nodeIds {
+			if _, isNodeIdInNewSequence := sh.NodeIdsLastSequenceAdded[nodeId]; isNodeIdInNewSequence {
+				continue
+			}
+			if occurrenceCount != functionNameCurrentOccurrenceCount[functionNameNewSequence] {
+				continue
+			}
+			// nodeId node matches with newSequenceIdTracker node
+			nodeIdMatches[nodeId] = newSequenceIdTracker
+		}
+		sizeOfNewSequence += 1
+	}
+	fmt.Printf("%v\n", nodeIdMatches)
+	x := map[int]struct{}{}
+	for key := range nodeIdMatches {
+		x[key] = struct{}{}
+	}
+	visited := x
+
+	advancedCount := 1
+	for advancedCount > 0 {
+		advancedCount = 0
+		y := map[int]struct{}{}
+		for nodeId := range x {
+			nextNodeId := (*sh.Sequences)[nodeId].GetLastEdge("next")
+			// skip over if at end of sequence
+			if nextNodeId == -1 {
+				continue
+			}
+			// skip over if node id has already been visited
+			if _, ok := visited[nextNodeId]; ok {
+				continue
+			}
+			visited[nextNodeId] = struct{}{}
+			advancedCount += 1
+			y[nextNodeId] = struct{}{}
+		}
+
+		if advancedCount > 0 {
+			x = y
+		}
+	}
+	fmt.Printf("%v\n", x)
+
+	nodeIdSize := map[int]int{}
+	for nodeId, _ := range x {
+		nodeIdSize[nodeId] = 1
+	}
+	atBeginingCount := 0
+	nodeIdSizeLength := len(nodeIdSize)
+	for atBeginingCount < nodeIdSizeLength {
+		for nodeId := range nodeIdSize {
+			prevNodeId := (*sh.Sequences)[nodeId].GetLastEdge("prev")
+			if prevNodeId == -1 {
+				atBeginingCount += 1
+				continue
+			}
+			nodeIdSize[prevNodeId] = nodeIdSize[nodeId] + 1
+			delete(nodeIdSize, nodeId)
+			// fmt.Printf("%v %v,%v\n", atBeginingCount, nodeIdSizeLength, prevNodeId)
+		}
+
+	}
+	fmt.Printf("node id size %v\n", nodeIdSize)
+	fmt.Printf("sequence size %v\n", sizeOfNewSequence)
+	// todo: The new sequence is a copy of 1 of the previous sequences.
+	// todo: The new and previous sequences have the same length, but number of matches < length of each sequence.
+	for nodeId := range nodeIdSize {
+		previousSequenceId := nodeId
+		for ; previousSequenceId != -1; previousSequenceId = (*sh.Sequences)[previousSequenceId].GetLastEdge("next") {
+			if newSequenceId, match := nodeIdMatches[previousSequenceId]; match {
+
+				newSequenceEdges := (*sh.Sequences)[newSequenceId].Edges
+				previousSequenceEdges := (*sh.Sequences)[previousSequenceId].Edges
+
+				newSequenceSize := sizeOfNewSequence
+				previousSequenceSize := nodeIdSize[nodeId]
+				if newSequenceSize > previousSequenceSize {
+					newSequenceEdges["parent"] = []int{previousSequenceId}
+					if _, isChildKeyPresent := previousSequenceEdges["child"]; !isChildKeyPresent {
+						previousSequenceEdges["child"] = []int{newSequenceId}
+					} else {
+						previousSequenceEdges["child"] = append(previousSequenceEdges["child"], newSequenceId)
+					}
+				} else if newSequenceSize < previousSequenceSize {
+					if _, isParentKeyPresent := previousSequenceEdges["parent"]; !isParentKeyPresent {
+						previousSequenceEdges["parent"] = []int{newSequenceId}
+					} else {
+						previousSequenceEdges["parent"] = append(newSequenceEdges["parent"], newSequenceId)
+					}
+					if _, isChildKeyPresent := newSequenceEdges["child"]; !isChildKeyPresent {
+						newSequenceEdges["child"] = []int{previousSequenceId}
+					} else {
+						newSequenceEdges["child"] = append(newSequenceEdges["child"], previousSequenceId)
+					}
+				}
+			}
+		}
+	}
+
+	// update operationNameToNodes
+	// add nodes to sequences and connect them with node ids found in operationNameToNodes
+	// find the sequences the nodes that match with the input are part of
+	// shorter sequences are above longer sequences
+	// sequences of same length are lower than the sequence of items they have in common in relative order
+	// the lower sequence doesn't match all its items with the higher sequence.
+	// lower sequence was entered before the higher sequences and
+	// only has 1 match with n different higher sequences and only 1 of those
+	// sequences has been entered
+	// count number of nodes in linked list
+
+}
 func (sh *SequenceHierarchy) Categorize() {
 
 	// trackingDict := map[int]CategoryTracker{}
@@ -347,7 +478,7 @@ func Pattern() {
 	item1 := Variables{State: map[string]interface{}{x: 0, y: 0, z: 0},
 		StructInstanceName: "item1"}
 
-	caretaker := Caretaker{keepLastEntry: true}
+	caretaker := Caretaker{}
 	itemSequence1 := []string{
 		mF1UY,
 		mF1UY,
