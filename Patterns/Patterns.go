@@ -110,11 +110,12 @@ func (sh *SequenceHierarchy) CreateSequenceOfCheckFunctionNames(
 			newNodeId := len(*Sequence)
 
 			temp := Node1{
-				Id:           newNodeId,
-				VariableName: changedVariableName,
-				FunctionName: functionNameMapCheckFunctionName[functionName],
-				TypeName:     typeName,
-				Edges:        map[string][]int{"prev": {prev}, "next": {-1}}}
+				Id:             newNodeId,
+				VariableName:   changedVariableName,
+				SequenceLength: len(sequence),
+				FunctionName:   functionNameMapCheckFunctionName[functionName],
+				TypeName:       typeName,
+				Edges:          map[string][]int{"prev": {prev}, "next": {-1}}}
 			if prev >= 0 {
 				newEdges := (*Sequence)[prev].Edges
 				newEdges["next"] = []int{temp.Id}
@@ -217,6 +218,15 @@ var catagoryTracker = map[int]CategoryTracker{}
 
 func (sh *SequenceHierarchy) Categorize2(newSequence *[]*Node1) {
 
+	// 1 to many matches from newSequence to sh.Sequences
+	// 1 to many matches where 1 item from newSequence matches with many different sequences
+	// long sequence(higher) that uses shorter sequences(lower) many times
+	// meauring complexity
+	// measuring specificy
+	// measuring reusability
+	// patterns as a hierarchy of sequences with limited lengths
+	// using different levels in hierarchy that represent new patterns when connected as a new pattern
+	// if the match sequence exists in sh.Sequence
 	// trackingDict := map[int]CategoryTracker{}
 	nodeIdMatches := map[int]int{}
 	functionNameCurrentOccurrenceCount := map[string]int{}
