@@ -226,6 +226,11 @@ func (sh *SequenceHierarchy) Categorize2(newSequence *[]*Node1) {
 	// measuring reusability
 	// patterns as a hierarchy of sequences with limited lengths
 	// using different levels in hierarchy that represent new patterns when connected as a new pattern
+	// recognize the pattern by building a hierarchy
+	// saving changing sequence of patterns of length 1 is saving change of changes.
+	// build pattern tree with pattern of arbitrary length using sequences of length 2
+	// pattern tree needs to be height balanced
+	// reading the input sequence, replacing subsequences with parent check function name when they match partitions of length 2
 	// if the match sequence exists in sh.Sequence
 	// trackingDict := map[int]CategoryTracker{}
 	nodeIdMatches := map[int]int{}
