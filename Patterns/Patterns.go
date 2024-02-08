@@ -488,6 +488,17 @@ func (sh *SequenceHierarchy) Categorize() {
 	// count number of nodes in linked list
 
 }
+
+type Node struct {
+	Id    int
+	Edges map[string][]int
+}
+
+var nodes [][]*Node
+
+func Hierarchy() {
+
+}
 func Pattern() {
 
 	item1 := Variables{State: map[string]interface{}{x: 0, y: 0, z: 0},
