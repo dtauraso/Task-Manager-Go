@@ -1,13 +1,13 @@
 package Patterns
 
 var Bottom map[string][]int = map[string][]int{
-	"a": {5},
+	"a": {7},
 	"b": {},
 	"c": {},
 	"d": {},
 	"e": {4},
 	"f": {},
-	"g": {6},
+	"g": {8},
 	"h": {},
 	"i": {1},
 	"j": {},
@@ -20,7 +20,7 @@ var Bottom map[string][]int = map[string][]int{
 	"q": {},
 	"r": {},
 	"s": {},
-	"t": {0, 2, 4},
+	"t": {0, 2, 6},
 	"u": {},
 	"v": {},
 	"w": {},

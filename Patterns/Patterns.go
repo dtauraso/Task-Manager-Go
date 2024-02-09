@@ -490,37 +490,88 @@ func (sh *SequenceHierarchy) Categorize() {
 }
 
 type Node struct {
-	Id    int
-	Edges map[string][]int
+	Id                  int
+	Edges               map[string][]int
+	IsActive            bool
+	ActiveChildrenCount int
 }
 
 var nodes []*Node
 
 func Hierarchy() {
 
-	node0 := Node{Id: 0, Edges: map[string][]int{"next": {1}, "prev": {-1}, "parent": {4}, "children": {}}}
-	node1 := Node{Id: 1, Edges: map[string][]int{"next": {2}, "prev": {0}, "parent": {4}, "children": {}}}
-	node2 := Node{Id: 2, Edges: map[string][]int{"next": {3}, "prev": {1}, "parent": {4}, "children": {}}}
-	node3 := Node{Id: 3, Edges: map[string][]int{"next": {-1}, "prev": {2}, "parent": {4}, "children": {}}}
+	node0 := Node{Id: 0, Edges: map[string][]int{"next": {1}, "prev": {-1}, "parent": {5}, "children": {}}, IsActive: false}
+	node1 := Node{Id: 1, Edges: map[string][]int{"next": {2}, "prev": {0}, "parent": {5}, "children": {}}, IsActive: false}
+	node2 := Node{Id: 2, Edges: map[string][]int{"next": {3}, "prev": {1}, "parent": {5}, "children": {}}, IsActive: false}
+	node3 := Node{Id: 3, Edges: map[string][]int{"next": {4}, "prev": {2}, "parent": {5}, "children": {}}, IsActive: false}
+	node4 := Node{Id: 4, Edges: map[string][]int{"next": {-1}, "prev": {3}, "parent": {5}, "children": {}}, IsActive: false}
 
-	node4 := Node{Id: 4, Edges: map[string][]int{"children": {0, 1, 2, 3, 4}}}
+	node5 := Node{Id: 5, Edges: map[string][]int{"children": {0, 1, 2, 3, 4}}, IsActive: false, ActiveChildrenCount: 0}
 
 	nodes = append(nodes, &node0)
 	nodes = append(nodes, &node1)
 	nodes = append(nodes, &node2)
 	nodes = append(nodes, &node3)
 	nodes = append(nodes, &node4)
-
-	node5 := Node{Id: 5, Edges: map[string][]int{"next": {6}, "prev": {-1}, "parent": {8}, "children": {}}}
-	node6 := Node{Id: 6, Edges: map[string][]int{"next": {7}, "prev": {6}, "parent": {8}, "children": {}}}
-	node7 := Node{Id: 7, Edges: map[string][]int{"next": {-1}, "prev": {6}, "parent": {8}, "children": {}}}
-
-	node8 := Node{Id: 8, Edges: map[string][]int{"children": {5, 6, 7}}}
-
 	nodes = append(nodes, &node5)
+
+	node6 := Node{Id: 6, Edges: map[string][]int{"next": {7}, "prev": {-1}, "parent": {9}, "children": {}}, IsActive: false}
+	node7 := Node{Id: 7, Edges: map[string][]int{"next": {8}, "prev": {6}, "parent": {9}, "children": {}}, IsActive: false}
+	node8 := Node{Id: 8, Edges: map[string][]int{"next": {-1}, "prev": {7}, "parent": {9}, "children": {}}, IsActive: false}
+
+	node9 := Node{Id: 9, Edges: map[string][]int{"children": {6, 7, 8}}, IsActive: false, ActiveChildrenCount: 0}
+
 	nodes = append(nodes, &node6)
 	nodes = append(nodes, &node7)
 	nodes = append(nodes, &node8)
+	nodes = append(nodes, &node9)
+
+	// get a first match wth input
+	// make list of candidates for possible match
+	// first candidate sequence wins
+	text0 := "title" // "tag"
+
+	winningNodeIds := []int{}
+	bottomTrackers := map[int]struct{}{}
+	for i := 0; i < len(text0); i++ {
+		letter := string(text0[i])
+		fmt.Printf("%s\n", letter)
+
+		tempBottomTrackers1 := map[int]struct{}{}
+		// todo: only the current options at time i should be considered when a letter is revisited
+		for _, nodeId := range Bottom[letter] {
+			if nodeId == -1 {
+				continue
+			}
+			tempBottomTrackers1[nodeId] = struct{}{}
+		}
+		bottomTrackers = tempBottomTrackers1
+
+		tempBottomTrackers := map[int]struct{}{}
+		fmt.Printf("bottom trackers loop start %v\n", bottomTrackers)
+		for nodeId := range bottomTrackers {
+
+			nodes[nodeId].IsActive = true
+			tempBottomTrackers[nodes[nodeId].Edges["next"][0]] = struct{}{}
+			parentId := nodes[nodeId].Edges["parent"][0]
+			nodes[parentId].ActiveChildrenCount += 1
+			if nodes[parentId].ActiveChildrenCount == len(nodes[parentId].Edges["children"]) {
+				winningNodeIds = append(winningNodeIds, parentId)
+			}
+
+		}
+		bottomTrackers = tempBottomTrackers
+		fmt.Printf("bottom trackers loop end %v\n", bottomTrackers)
+		for _, nodeRef := range nodes {
+			fmt.Printf("Node %v\n", *nodeRef)
+		}
+
+	}
+	fmt.Printf("%v\n", winningNodeIds)
+	for _, nodeRef := range nodes {
+		fmt.Printf("Node %v\n", *nodeRef)
+	}
+	fmt.Printf("\n")
 
 }
 func Pattern() {
