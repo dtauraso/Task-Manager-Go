@@ -494,9 +494,33 @@ type Node struct {
 	Edges map[string][]int
 }
 
-var nodes [][]*Node
+var nodes []*Node
 
 func Hierarchy() {
+
+	node0 := Node{Id: 0, Edges: map[string][]int{"next": {1}, "prev": {-1}, "parent": {4}, "children": {}}}
+	node1 := Node{Id: 1, Edges: map[string][]int{"next": {2}, "prev": {0}, "parent": {4}, "children": {}}}
+	node2 := Node{Id: 2, Edges: map[string][]int{"next": {3}, "prev": {1}, "parent": {4}, "children": {}}}
+	node3 := Node{Id: 3, Edges: map[string][]int{"next": {-1}, "prev": {2}, "parent": {4}, "children": {}}}
+
+	node4 := Node{Id: 4, Edges: map[string][]int{"children": {0, 1, 2, 3, 4}}}
+
+	nodes = append(nodes, &node0)
+	nodes = append(nodes, &node1)
+	nodes = append(nodes, &node2)
+	nodes = append(nodes, &node3)
+	nodes = append(nodes, &node4)
+
+	node5 := Node{Id: 5, Edges: map[string][]int{"next": {6}, "prev": {-1}, "parent": {8}, "children": {}}}
+	node6 := Node{Id: 6, Edges: map[string][]int{"next": {7}, "prev": {6}, "parent": {8}, "children": {}}}
+	node7 := Node{Id: 7, Edges: map[string][]int{"next": {-1}, "prev": {6}, "parent": {8}, "children": {}}}
+
+	node8 := Node{Id: 8, Edges: map[string][]int{"children": {5, 6, 7}}}
+
+	nodes = append(nodes, &node5)
+	nodes = append(nodes, &node6)
+	nodes = append(nodes, &node7)
+	nodes = append(nodes, &node8)
 
 }
 func Pattern() {
