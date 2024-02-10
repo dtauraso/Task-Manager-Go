@@ -498,6 +498,53 @@ type Node struct {
 
 var nodes []*Node
 
+func (sh *SequenceHierarchy) CreateSequenceOfCheckFunctionNames2(
+	v *Variables,
+	c *Caretaker,
+	sequence []string) *[]*Node1 {
+
+	head := -1
+	prev := head
+	lastOperationName := ""
+	Sequence := &[]*Node1{}
+	sh.FirstNodeIdLastSequenceAdded = len(*sh.Sequences)
+	for _, functionName := range sequence {
+		functions[functionName].(func(v *Variables, c *Caretaker))(v, c)
+		if functionName != lastOperationName {
+
+			changedVariableName := ""
+			typeName := ""
+			// likely to be O(1) due to each operation only changing 1 variable at a time
+			for variableName, value := range v.State {
+				prevValue := c.GetLastMemento(v.StructInstanceName).State[variableName]
+				if value != prevValue {
+					changedVariableName = variableName
+					typeName = fmt.Sprintf("%T", value)
+				}
+			}
+
+			newNodeId := len(*Sequence)
+
+			temp := Node1{
+				Id:             newNodeId,
+				VariableName:   changedVariableName,
+				SequenceLength: len(sequence),
+				FunctionName:   functionNameMapCheckFunctionName[functionName],
+				TypeName:       typeName,
+				Edges:          map[string][]int{"prev": {prev}, "next": {-1}}}
+			if prev >= 0 {
+				newEdges := (*Sequence)[prev].Edges
+				newEdges["next"] = []int{temp.Id}
+				(*Sequence)[prev].Edges = newEdges
+			}
+			*Sequence = append(*Sequence, &temp)
+			prev = temp.Id
+		}
+		lastOperationName = functionName
+	}
+
+	return Sequence
+}
 func Hierarchy() {
 
 	node0 := Node{Id: 0, Edges: map[string][]int{"next": {1}, "prev": {-1}, "parent": {5}, "children": {}}, IsActive: false}
@@ -538,24 +585,42 @@ func Hierarchy() {
 		fmt.Printf("%s\n", letter)
 
 		tempBottomTrackers1 := map[int]struct{}{}
-		// todo: only the current options at time i should be considered when a letter is revisited
+
+		parents := map[int]struct{}{}
+		// assumes leftmost index of sequence in Bottom[letter] is the start of the sequence
 		for _, nodeId := range Bottom[letter] {
 			if nodeId == -1 {
 				continue
 			}
-			tempBottomTrackers1[nodeId] = struct{}{}
+			if nodes[nodeId].IsActive {
+				continue
+			}
+
+			// need to make sure nodeId's aren't part of the same sequence
+			if _, ok := parents[nodes[nodeId].Edges["parent"][0]]; !ok {
+				parents[nodes[nodeId].Edges["parent"][0]] = struct{}{}
+				tempBottomTrackers1[nodeId] = struct{}{}
+			}
+
 		}
+		fmt.Printf("parents %v\n", parents)
 		bottomTrackers = tempBottomTrackers1
 
 		tempBottomTrackers := map[int]struct{}{}
 		fmt.Printf("bottom trackers loop start %v\n", bottomTrackers)
 		for nodeId := range bottomTrackers {
 
+			if nodeId == -1 {
+				continue
+			}
 			nodes[nodeId].IsActive = true
+
 			tempBottomTrackers[nodes[nodeId].Edges["next"][0]] = struct{}{}
 			parentId := nodes[nodeId].Edges["parent"][0]
+
 			nodes[parentId].ActiveChildrenCount += 1
 			if nodes[parentId].ActiveChildrenCount == len(nodes[parentId].Edges["children"]) {
+				nodes[parentId].IsActive = true
 				winningNodeIds = append(winningNodeIds, parentId)
 			}
 
@@ -567,6 +632,8 @@ func Hierarchy() {
 		}
 
 	}
+	// todo: travel and activate nodes for the remainder of the sequence
+	// stop activating nodes if the next step has more than 1 possibility
 	fmt.Printf("%v\n", winningNodeIds)
 	for _, nodeRef := range nodes {
 		fmt.Printf("Node %v\n", *nodeRef)
