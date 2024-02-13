@@ -498,80 +498,38 @@ type Node struct {
 
 var nodes []*Node
 
-func (sh *SequenceHierarchy) CreateSequenceOfCheckFunctionNames2(
-	v *Variables,
-	c *Caretaker,
-	sequence []string) *[]*Node1 {
+func doublyLinkSequence(nodes *[]*Node, Bottom map[string][]int, sequence string) (parentNodeId int) {
 
 	head := -1
 	prev := head
-	lastOperationName := ""
-	Sequence := &[]*Node1{}
-	sh.FirstNodeIdLastSequenceAdded = len(*sh.Sequences)
-	for _, functionName := range sequence {
-		functions[functionName].(func(v *Variables, c *Caretaker))(v, c)
-		if functionName != lastOperationName {
+	childIds := []int{}
+	parentNodeId = len(*nodes) + len(sequence)
 
-			changedVariableName := ""
-			typeName := ""
-			// likely to be O(1) due to each operation only changing 1 variable at a time
-			for variableName, value := range v.State {
-				prevValue := c.GetLastMemento(v.StructInstanceName).State[variableName]
-				if value != prevValue {
-					changedVariableName = variableName
-					typeName = fmt.Sprintf("%T", value)
-				}
-			}
+	for _, item := range sequence {
 
-			newNodeId := len(*Sequence)
-
-			temp := Node1{
-				Id:             newNodeId,
-				VariableName:   changedVariableName,
-				SequenceLength: len(sequence),
-				FunctionName:   functionNameMapCheckFunctionName[functionName],
-				TypeName:       typeName,
-				Edges:          map[string][]int{"prev": {prev}, "next": {-1}}}
-			if prev >= 0 {
-				newEdges := (*Sequence)[prev].Edges
-				newEdges["next"] = []int{temp.Id}
-				(*Sequence)[prev].Edges = newEdges
-			}
-			*Sequence = append(*Sequence, &temp)
-			prev = temp.Id
+		newNodeId := len(*nodes)
+		childIds = append(childIds, newNodeId)
+		bottomEdges := Bottom[string(item)]
+		bottomEdges = append(bottomEdges, newNodeId)
+		Bottom[string(item)] = bottomEdges
+		temp := Node{
+			Id:    newNodeId,
+			Edges: map[string][]int{"prev": {prev}, "next": {-1}, "parents": {parentNodeId}}}
+		if prev >= 0 {
+			newEdges := (*nodes)[prev].Edges
+			newEdges["next"] = []int{temp.Id}
+			(*nodes)[prev].Edges = newEdges
 		}
-		lastOperationName = functionName
+		*nodes = append(*nodes, &temp)
+		prev = temp.Id
 	}
-
-	return Sequence
+	*nodes = append(*nodes, &Node{Id: parentNodeId, Edges: map[string][]int{"children": childIds}})
+	return parentNodeId
 }
 func Hierarchy() {
 
-	node0 := Node{Id: 0, Edges: map[string][]int{"next": {1}, "prev": {-1}, "parent": {5}, "children": {}}, IsActive: false}
-	node1 := Node{Id: 1, Edges: map[string][]int{"next": {2}, "prev": {0}, "parent": {5}, "children": {}}, IsActive: false}
-	node2 := Node{Id: 2, Edges: map[string][]int{"next": {3}, "prev": {1}, "parent": {5}, "children": {}}, IsActive: false}
-	node3 := Node{Id: 3, Edges: map[string][]int{"next": {4}, "prev": {2}, "parent": {5}, "children": {}}, IsActive: false}
-	node4 := Node{Id: 4, Edges: map[string][]int{"next": {-1}, "prev": {3}, "parent": {5}, "children": {}}, IsActive: false}
-
-	node5 := Node{Id: 5, Edges: map[string][]int{"children": {0, 1, 2, 3, 4}}, IsActive: false, ActiveChildrenCount: 0}
-
-	nodes = append(nodes, &node0)
-	nodes = append(nodes, &node1)
-	nodes = append(nodes, &node2)
-	nodes = append(nodes, &node3)
-	nodes = append(nodes, &node4)
-	nodes = append(nodes, &node5)
-
-	node6 := Node{Id: 6, Edges: map[string][]int{"next": {7}, "prev": {-1}, "parent": {9}, "children": {}}, IsActive: false}
-	node7 := Node{Id: 7, Edges: map[string][]int{"next": {8}, "prev": {6}, "parent": {9}, "children": {}}, IsActive: false}
-	node8 := Node{Id: 8, Edges: map[string][]int{"next": {-1}, "prev": {7}, "parent": {9}, "children": {}}, IsActive: false}
-
-	node9 := Node{Id: 9, Edges: map[string][]int{"children": {6, 7, 8}}, IsActive: false, ActiveChildrenCount: 0}
-
-	nodes = append(nodes, &node6)
-	nodes = append(nodes, &node7)
-	nodes = append(nodes, &node8)
-	nodes = append(nodes, &node9)
+	_ = doublyLinkSequence(&nodes, Bottom, "title")
+	_ = doublyLinkSequence(&nodes, Bottom, "tag")
 
 	// get a first match wth input
 	// make list of candidates for possible match
@@ -597,8 +555,8 @@ func Hierarchy() {
 			}
 
 			// need to make sure nodeId's aren't part of the same sequence
-			if _, ok := parents[nodes[nodeId].Edges["parent"][0]]; !ok {
-				parents[nodes[nodeId].Edges["parent"][0]] = struct{}{}
+			if _, ok := parents[nodes[nodeId].Edges["parents"][0]]; !ok {
+				parents[nodes[nodeId].Edges["parents"][0]] = struct{}{}
 				tempBottomTrackers1[nodeId] = struct{}{}
 			}
 
@@ -616,7 +574,7 @@ func Hierarchy() {
 			nodes[nodeId].IsActive = true
 
 			tempBottomTrackers[nodes[nodeId].Edges["next"][0]] = struct{}{}
-			parentId := nodes[nodeId].Edges["parent"][0]
+			parentId := nodes[nodeId].Edges["parents"][0]
 
 			nodes[parentId].ActiveChildrenCount += 1
 			if nodes[parentId].ActiveChildrenCount == len(nodes[parentId].Edges["children"]) {
@@ -634,6 +592,8 @@ func Hierarchy() {
 	}
 	// todo: travel and activate nodes for the remainder of the sequence
 	// stop activating nodes if the next step has more than 1 possibility
+	// autocomplete is depth first traveral
+	// autocomplete stops at tracker n if tracker n is on a "user input" node
 	fmt.Printf("%v\n", winningNodeIds)
 	for _, nodeRef := range nodes {
 		fmt.Printf("Node %v\n", *nodeRef)
