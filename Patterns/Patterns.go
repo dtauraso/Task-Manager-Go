@@ -498,38 +498,81 @@ type Node struct {
 
 var nodes []*Node
 
-func doublyLinkSequence(nodes *[]*Node, Bottom map[string][]int, sequence string) (parentNodeId int) {
+func updateBottom(Bottom *map[string][]int, item rune, newNodeId int) *map[string][]int {
+	bottomEdges := (*Bottom)[string(item)]
+	bottomEdges = append(bottomEdges, newNodeId)
+	(*Bottom)[string(item)] = bottomEdges
+	return Bottom
+}
+func addToDoublyLinkedList(nodes *[]*Node, prev, newNodeId, parentNodeId int) (tempId int) {
+	temp := Node{
+		Id:    newNodeId,
+		Edges: map[string][]int{"prev": {prev}, "next": {-1}, "parents": {parentNodeId}}}
+	if prev >= 0 {
+		newEdges := (*nodes)[prev].Edges
+		newEdges["next"] = []int{temp.Id}
+		(*nodes)[prev].Edges = newEdges
+	}
+	*nodes = append(*nodes, &temp)
+	return temp.Id
+}
+func makeDoublyLinkedListForArrays(nodes *[]*Node, Bottom *map[string][]int, childIds []int, prev int, item interface{}) (tempId int) {
+	parentNodeId := doublyLinkSequence(nodes, Bottom, item)
+	newNodeId := len(*nodes)
+	childIds = append(childIds, newNodeId)
+	tempId = addToDoublyLinkedList(nodes, prev, newNodeId, parentNodeId)
+	return tempId
+}
+func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence interface{}) (parentNodeId int) {
 
 	head := -1
 	prev := head
 	childIds := []int{}
-	parentNodeId = len(*nodes) + len(sequence)
+	fmt.Printf("%s\n", fmt.Sprintf("%T", sequence))
 
-	for _, item := range sequence {
+	switch sequence.(type) {
+	case []interface{}:
+		parentNodeId = len(*nodes) + len(sequence.([]interface{}))
 
-		newNodeId := len(*nodes)
-		childIds = append(childIds, newNodeId)
-		bottomEdges := Bottom[string(item)]
-		bottomEdges = append(bottomEdges, newNodeId)
-		Bottom[string(item)] = bottomEdges
-		temp := Node{
-			Id:    newNodeId,
-			Edges: map[string][]int{"prev": {prev}, "next": {-1}, "parents": {parentNodeId}}}
-		if prev >= 0 {
-			newEdges := (*nodes)[prev].Edges
-			newEdges["next"] = []int{temp.Id}
-			(*nodes)[prev].Edges = newEdges
+		for _, item := range sequence.([]interface{}) {
+			parentNodeId := doublyLinkSequence(nodes, Bottom, item)
+			newNodeId := len(*nodes)
+			childIds = append(childIds, newNodeId)
+			tempId := addToDoublyLinkedList(nodes, prev, newNodeId, parentNodeId)
+			// tempId := makeDoublyLinkedListForArrays(nodes, Bottom, childIds, prev, item)
+			prev = tempId
 		}
-		*nodes = append(*nodes, &temp)
-		prev = temp.Id
+	case []string:
+		parentNodeId = len(*nodes) + len(sequence.([]string))
+
+		for _, item := range sequence.([]string) {
+			parentNodeId := doublyLinkSequence(nodes, Bottom, item)
+			newNodeId := len(*nodes)
+			childIds = append(childIds, newNodeId)
+			tempId := addToDoublyLinkedList(nodes, prev, newNodeId, parentNodeId)
+			// tempId := makeDoublyLinkedListForArrays(nodes, Bottom, childIds, prev, item)
+			prev = tempId
+		}
+	case string:
+		parentNodeId = len(*nodes) + len(sequence.(string))
+		for _, item := range sequence.(string) {
+			newNodeId := len(*nodes)
+			childIds = append(childIds, newNodeId)
+			Bottom = updateBottom(Bottom, item, newNodeId)
+			tempId := addToDoublyLinkedList(nodes, prev, newNodeId, parentNodeId)
+			prev = tempId
+		}
+	default:
+		return -1
 	}
 	*nodes = append(*nodes, &Node{Id: parentNodeId, Edges: map[string][]int{"children": childIds}})
 	return parentNodeId
 }
 func Hierarchy() {
 
-	_ = doublyLinkSequence(&nodes, Bottom, "title")
-	_ = doublyLinkSequence(&nodes, Bottom, "tag")
+	// _ = doublyLinkSequence(&nodes, &Bottom, "title")
+	// _ = doublyLinkSequence(&nodes, &Bottom, "tag")
+	_ = doublyLinkSequence(&nodes, &Bottom, []string{"title", "tag"})
 
 	// get a first match wth input
 	// make list of candidates for possible match
