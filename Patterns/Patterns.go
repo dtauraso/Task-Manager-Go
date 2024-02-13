@@ -542,17 +542,6 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 			// tempId := makeDoublyLinkedListForArrays(nodes, Bottom, childIds, prev, item)
 			prev = tempId
 		}
-	case []string:
-		parentNodeId = len(*nodes) + len(sequence.([]string))
-
-		for _, item := range sequence.([]string) {
-			parentNodeId := doublyLinkSequence(nodes, Bottom, item)
-			newNodeId := len(*nodes)
-			childIds = append(childIds, newNodeId)
-			tempId := addToDoublyLinkedList(nodes, prev, newNodeId, parentNodeId)
-			// tempId := makeDoublyLinkedListForArrays(nodes, Bottom, childIds, prev, item)
-			prev = tempId
-		}
 	case string:
 		parentNodeId = len(*nodes) + len(sequence.(string))
 		for _, item := range sequence.(string) {
@@ -572,7 +561,7 @@ func Hierarchy() {
 
 	// _ = doublyLinkSequence(&nodes, &Bottom, "title")
 	// _ = doublyLinkSequence(&nodes, &Bottom, "tag")
-	_ = doublyLinkSequence(&nodes, &Bottom, []string{"title", "tag"})
+	_ = doublyLinkSequence(&nodes, &Bottom, []interface{}{[]interface{}{"title", "tag"}})
 
 	// get a first match wth input
 	// make list of candidates for possible match
