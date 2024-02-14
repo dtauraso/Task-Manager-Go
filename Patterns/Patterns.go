@@ -529,7 +529,10 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 	prev := head
 	childIds := []int{}
 	fmt.Printf("%s\n", fmt.Sprintf("%T", sequence))
-
+	// tree entries off slightly
+	// change where the read write heads are (repeat visitting same items
+	// write down the autocompleted sequence)
+	// autocomplete stops when sequence finishes last node
 	switch sequence.(type) {
 	case []interface{}:
 		parentNodeId = len(*nodes) + len(sequence.([]interface{}))
@@ -557,6 +560,7 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 	*nodes = append(*nodes, &Node{Id: parentNodeId, Edges: map[string][]int{"children": childIds}})
 	return parentNodeId
 }
+
 func Hierarchy() {
 
 	// _ = doublyLinkSequence(&nodes, &Bottom, "title")
@@ -633,6 +637,7 @@ func Hierarchy() {
 	fmt.Printf("\n")
 
 }
+
 func Pattern() {
 
 	item1 := Variables{State: map[string]interface{}{x: 0, y: 0, z: 0},
