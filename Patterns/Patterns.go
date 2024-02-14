@@ -530,6 +530,9 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 	childIds := []int{}
 	fmt.Printf("%s\n", fmt.Sprintf("%T", sequence))
 	// tree entries off slightly
+	// make sepcific parent node for each different sequence visiting same subsequence
+	// make 1 node connecting to the specific parent nodes for sequences with variation that are the same
+	// at 1 point in time
 	// change where the read write heads are (repeat visitting same items
 	// write down the autocompleted sequence)
 	// autocomplete stops when sequence finishes last node
