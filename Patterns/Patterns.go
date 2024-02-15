@@ -581,10 +581,12 @@ func Hierarchy() {
 
 		higher connection strength = presence in typical sequence "title"
 		connection grows at even pace before treshold value x
-		connection slows down growth after threshold x
-		connection decays by 1 uit after treshold value if it's not used(current time - last time used = y where y > z)
+		connection stop growing at threashold value x
 
-		threshold value x determines if item is in typical sequence
+		connections reaching x that are made at a later time than existing typical connections
+		are make into a new typical sequence
+		reuse the typical sequence that is the same as the recient typical sequence
+
 
 	*/
 	// get a first match wth input
