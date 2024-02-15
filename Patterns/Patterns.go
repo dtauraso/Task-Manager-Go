@@ -530,7 +530,7 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 	childIds := []int{}
 	fmt.Printf("%s\n", fmt.Sprintf("%T", sequence))
 	// tree entries off slightly
-	// make sepcific parent node for each different sequence visiting same subsequence
+	// make specific parent node for each different sequence visiting same subsequence
 	// make 1 node connecting to the specific parent nodes for sequences with variation that are the same
 	// at 1 point in time
 	// change where the read write heads are (repeat visitting same items
@@ -575,10 +575,48 @@ func Hierarchy() {
 	_ = doublyLinkSequence(&nodes, &Bottom, []interface{}{"xtitle", "ytitle", "titxle", "tiytle"})
 
 	/*
+		typical sequence construction
+			matching items in sequence get stronger connections
+			non matching items in sequence get weaker connections
+			sort by increasing frquency
+			sequence can be extended while frequencey ratio from least frequent item to the most frequent item is < 10%
+			when item at pos 0 is >= 10% weaker than the item at pos len(sequence) - 1, then item at pos 0 is removed
+			remaining items winn when pos 0 is < 10% weaker than pos len(sequence) - 1
+			the typical sequence strengths become permanent
+
+		"xtitle",
+		"ytitle",
+		"titxle",
+		"tiytle"
 		xt, 1
 		yt, 1
 		-t, 2
 
+		"x",
+
+
+		"y",
+
+
+
+		"t",
+
+
+
+
+		"t"
+
+		nodes in typical sequence that aren't being matched drop out over time (time block for figuring out the typical sequence)
+		a new typical sequence reusing previous items are part of a different time block than previously made typical sequence
+		typical sequence are permanent once noise has been removed
+		time box holds n sequences and the threashold value for permanence is the number of items inside the time box
+		n sequences is the threshold value for permanence
+			need enough examples that the typical sequence can be made
+		how to measure time boxes for a user entering 1 item at a time
+
+		ratio of least frequent item in sequence to most frequent item in sequence
+
+		block of time reading in sequences vs connection growth threashold value x
 		higher connection strength = presence in typical sequence "title"
 		connection grows at even pace before treshold value x
 		connection stop growing at threashold value x
