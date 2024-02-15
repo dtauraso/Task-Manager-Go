@@ -587,6 +587,10 @@ func Hierarchy() {
 		are make into a new typical sequence
 		reuse the typical sequence that is the same as the recient typical sequence
 
+		x, item1, y
+		x, item2, y
+		item1 has a similarity distance to item2
+
 
 	*/
 	// get a first match wth input
