@@ -537,6 +537,8 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 	// write down the autocompleted sequence)
 	// autocomplete stops when sequence finishes last node
 	// bias in favor of patterns
+	// measure connection strength
+	// stronger connections dictate the order
 	switch sequence.(type) {
 	case []interface{}:
 		parentNodeId = len(*nodes) + len(sequence.([]interface{}))
@@ -570,8 +572,21 @@ func Hierarchy() {
 	// _ = doublyLinkSequence(&nodes, &Bottom, "title")
 	// _ = doublyLinkSequence(&nodes, &Bottom, "tag")
 	// _ = doublyLinkSequence(&nodes, &Bottom, []interface{}{[]interface{}{"title", "tag"}})
-	_ = doublyLinkSequence(&nodes, &Bottom, []interface{}{"txitle", "tyitle", "titxle"})
+	_ = doublyLinkSequence(&nodes, &Bottom, []interface{}{"xtitle", "ytitle", "titxle", "tiytle"})
 
+	/*
+		xt, 1
+		yt, 1
+		-t, 2
+
+		higher connection strength = presence in typical sequence "title"
+		connection grows at even pace before treshold value x
+		connection slows down growth after threshold x
+		connection decays by 1 uit after treshold value if it's not used(current time - last time used = y where y > z)
+
+		threshold value x determines if item is in typical sequence
+
+	*/
 	// get a first match wth input
 	// make list of candidates for possible match
 	// first candidate sequence wins
