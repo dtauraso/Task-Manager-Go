@@ -536,6 +536,7 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 	// change where the read write heads are (repeat visitting same items
 	// write down the autocompleted sequence)
 	// autocomplete stops when sequence finishes last node
+	// bias in favor of patterns
 	switch sequence.(type) {
 	case []interface{}:
 		parentNodeId = len(*nodes) + len(sequence.([]interface{}))
@@ -568,7 +569,8 @@ func Hierarchy() {
 
 	// _ = doublyLinkSequence(&nodes, &Bottom, "title")
 	// _ = doublyLinkSequence(&nodes, &Bottom, "tag")
-	_ = doublyLinkSequence(&nodes, &Bottom, []interface{}{[]interface{}{"title", "tag"}})
+	// _ = doublyLinkSequence(&nodes, &Bottom, []interface{}{[]interface{}{"title", "tag"}})
+	_ = doublyLinkSequence(&nodes, &Bottom, []interface{}{"txitle", "tyitle", "titxle"})
 
 	// get a first match wth input
 	// make list of candidates for possible match
