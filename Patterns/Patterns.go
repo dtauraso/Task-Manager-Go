@@ -592,9 +592,10 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 //	the data is the program code and user entered data
 //	user either adds new data or revisits existing data
 //	all input data is used to write down the next expected data as a prediction
-// 		the program code predictions are predetermined
-// 		the user data predictions use earlier entered data subjected to the frequency ratio out of bounds rule
-
+//		the program code predictions are predetermined
+//		the user data predictions use earlier entered data subjected to the frequency ratio out of bounds rule
+//	the similar paths for the program code will have different contexts to ensure parents don't have >= 2 possible paths
+//	to visit
 func Hierarchy() {
 
 	// _ = doublyLinkSequence(&nodes, &Bottom, "title")
