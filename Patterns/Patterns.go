@@ -584,7 +584,10 @@ func Hierarchy() {
 	// _ = doublyLinkSequence(&nodes, &Bottom, "title")
 	// _ = doublyLinkSequence(&nodes, &Bottom, "tag")
 	// _ = doublyLinkSequence(&nodes, &Bottom, []interface{}{[]interface{}{"title", "tag"}})
-	_ = doublyLinkSequence(&nodes, &Bottom, []interface{}{"xti", "yti", "tix"})
+	_ = doublyLinkSequence(&nodes, &Bottom, []interface{}{
+		[]interface{}{"x", "t", "i"},
+		[]interface{}{"y", "t", "i"},
+		[]interface{}{"t", "i", "x"}})
 
 	/*
 		typical sequence construction
