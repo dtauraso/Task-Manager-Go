@@ -570,14 +570,12 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 // doubly link new nodes
 // increase occurrence count for new nodes(1) and revisiting nodes(x + 1)
 // if first and last node have a frequency ratio too far apart
-//
-//	make sorted list of nodes from sequence prev and current in assending order using occurrence count
-//	remove nodes on the list where frquency ratio is out of bounds
-//	take remaining nodes on the list and make 1 parent node they all connect it (typical sequence)
-//
+//		make sorted list of nodes from sequence prev and current in assending order using occurrence count
+//		remove nodes on the list where frquency ratio is out of bounds
+//		take remaining nodes on the list and make 1 parent node they all connect it (typical sequence)
 // if parent of nodes exists
-// 	activated nodes move to parent
-// 	repeat increase ocurrence count step
+// 		activated nodes move to parent
+// 		repeat increase ocurrence count step
 
 func Hierarchy() {
 
@@ -595,53 +593,6 @@ func Hierarchy() {
 			when item at pos 0 is >= 10% weaker than the item at pos len(sequence) - 1, then item at pos 0 is removed
 			remaining items winn when pos 0 is < 10% weaker than pos len(sequence) - 1
 			the typical sequence strengths become permanent
-
-		"xtitle",
-		"ytitle",
-		"titxle",
-		"tiytle"
-		xt, 1
-		yt, 1
-		-t, 2
-
-		"x",
-
-
-		"y",
-
-
-
-		"t",
-
-
-
-
-		"t"
-
-		nodes in typical sequence that aren't being matched drop out over time (time block for figuring out the typical sequence)
-		a new typical sequence reusing previous items are part of a different time block than previously made typical sequence
-		typical sequence are permanent once noise has been removed
-		time box holds n sequences and the threashold value for permanence is the number of items inside the time box
-		n sequences is the threshold value for permanence
-			need enough examples that the typical sequence can be made
-		how to measure time boxes for a user entering 1 item at a time
-
-		ratio of least frequent item in sequence to most frequent item in sequence
-
-		block of time reading in sequences vs connection growth threashold value x
-		higher connection strength = presence in typical sequence "title"
-		connection grows at even pace before treshold value x
-		connection stop growing at threashold value x
-
-		connections reaching x that are made at a later time than existing typical connections
-		are make into a new typical sequence
-		reuse the typical sequence that is the same as the recient typical sequence
-
-		x, item1, y
-		x, item2, y
-		item1 has a similarity distance to item2
-
-
 	*/
 	// get a first match wth input
 	// make list of candidates for possible match
