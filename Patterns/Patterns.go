@@ -568,6 +568,8 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 }
 
 // doubly link new nodes
+// if the same sequence of length > 1 is revsited from a different starting point
+//		replacing sequences with 1 node
 // increase occurrence count for new nodes(1) and revisiting nodes(x + 1)
 // if first and last node have a frequency ratio too far apart
 //		make sorted list of nodes from sequence prev and current in assending order using occurrence count
@@ -576,7 +578,6 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 // if parent of nodes exists
 // 		activated nodes move to parent
 // 		repeat increase ocurrence count step
-// todo: replacing sequences with 1 node when the same sequence of length > 1 is revsited from a different starting point
 
 func Hierarchy() {
 
