@@ -569,17 +569,31 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 
 // doubly link new nodes
 // if the same sequence of length > 1 is revsited from a different starting point
-//		replace sequence with 1 node for each starting point
+//
+//	replace sequence with 1 node for each starting point
+//
 // increase occurrence count for new nodes(1) and revisiting nodes(x + 1)
 // if first and last node have a frequency ratio too far apart
-//		make sorted list of nodes from sequence prev and current in assending order using occurrence count
-//		remove nodes on the list where frquency ratio is out of bounds
-//		take remaining nodes on the list and make 1 parent node they all connect it (typical sequence)
+//
+//	make sorted list of nodes from sequence prev and current in assending order using occurrence count
+//	remove nodes on the list where frquency ratio is out of bounds
+//	take remaining nodes on the list and make 1 parent node they all connect it (typical sequence)
+//
 // if parent of nodes exists
-// 		activated nodes move to parent
-//		activate parent
-//		parent's nexts are the predictions to write with dft
-// 		repeat increase ocurrence count step
+//
+//	activated nodes move to parent
+//	activate parent
+//	parent's nexts are the predictions to write with dft
+//	repeat increase ocurrence count step
+//
+// assumptions
+//
+//	most of the data will not have randomness
+//	the data is the program code and user entered data
+//	user either adds new data or revisits existing data
+//	all input data is used to write down the next expected data as a prediction
+// 		the program code predictions are predetermined
+// 		the user data predictions use earlier entered data subjected to the frequency ratio out of bounds rule
 
 func Hierarchy() {
 
