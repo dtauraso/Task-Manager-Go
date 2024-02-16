@@ -577,11 +577,8 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 //		take remaining nodes on the list and make 1 parent node they all connect it (typical sequence)
 // if parent of nodes exists
 // 		activated nodes move to parent
-// 		1 goroutine for dft 1 level up from activated nodes (autocomplete)
-// 			dft the next link unless next has no links
-// 			if next has n links
-//				there is no if statement as 1 of the options is already predetermined to be run by the begining of the sequence
-//  			1 goroutine per link
+//		activate parent
+//		parent's nexts are the predictions to write with dft
 // 		repeat increase ocurrence count step
 
 func Hierarchy() {
