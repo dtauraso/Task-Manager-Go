@@ -576,13 +576,14 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 // if parent of nodes exists
 // 		activated nodes move to parent
 // 		repeat increase ocurrence count step
+// todo: replacing sequences with 1 node when the same sequence of length > 1 is revsited from a different starting point
 
 func Hierarchy() {
 
 	// _ = doublyLinkSequence(&nodes, &Bottom, "title")
 	// _ = doublyLinkSequence(&nodes, &Bottom, "tag")
 	// _ = doublyLinkSequence(&nodes, &Bottom, []interface{}{[]interface{}{"title", "tag"}})
-	_ = doublyLinkSequence(&nodes, &Bottom, []interface{}{"xtitle", "ytitle", "titxle", "tiytle"})
+	_ = doublyLinkSequence(&nodes, &Bottom, []interface{}{"xti", "yti", "tix"})
 
 	/*
 		typical sequence construction
