@@ -567,13 +567,29 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 	return parentNodeId
 }
 
+// "1+1", "2" are members of tribe A
+// "1+1+1", "3" are members of tribe B
+// neither member of each tribe can steal a member of another tribe
+// a new tribe can be make of members of any 2 tribes using "" before the members of each tribe: "", "1+1", "3"
+
+// 2 different things are the same if they end at the same self-consistent place
+// how to save a sequence that is the logical computing
 // 1 parent node for a typical sequence (typical sequence is "key", like the letters in Bottom are)
 // n parent nodes above the 1 parent nodes for sequences that include the typical sequence
 // predict by letter and by ith time step (what was seen at time step i last time)
-// "1+1" == "2", "1+1" != "3"
-// remvoed barrier and the sequences were not distinguishable
+// "1+1" == "2", "1+1+1" == "3"
+// "l#+#=##"
+// "l#+#+#=###"
+// "+" means connect
+// "=" means refer earlier sequence to show both are the same (reject if sequences differ)
+// "l#+#+#=##" is false
+// "p#+#+#=##" is true
+// removed barrier and the sequences were not distinguishable
 // awareness restriction and localization
 // self-consistent: P=P
+// Logic connects premisses (assumptions) to a conclusion in an unerring way.
+// Logic can only prove that conclusions are impossible if the conclusion requires mutually contradictory assumptions
+// how to prove 2 sequences are contradictory
 // doubly link new nodes
 // doubly link existing nodes with new path
 // may be more than 1 possible node that is asked to match with input
