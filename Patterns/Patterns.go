@@ -567,18 +567,43 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 	return parentNodeId
 }
 
+// 1 parent node for a typical sequence (typical sequence is "key", like the letters in Bottom are)
+// n parent nodes above the 1 parent nodes for sequences that include the typical sequence
+// predict by letter and by ith time step (what was seen at time step i last time)
+// "1+1" == "2", "1+1" != "3"
+// remvoed barrier and the sequences were not distinguishable
+// awareness restriction and localization
+// self-consistent: P=P
 // doubly link new nodes
+// doubly link existing nodes with new path
+// may be more than 1 possible node that is asked to match with input
 // if the same sequence of length > 1 is revsited from a different starting point
+//
 //	make sequence a child sequence with 1 parent node for each starting point
+//
 // increase occurrence count for new nodes(1) and revisiting nodes(x + 1)
 // if first and last node have a frequency ratio too far apart
+// 	assumes we can isolate all of the nodes in the scope
+// 	what the next node is, what the next nodes are in the previous finite sequence
+// 	can't assume all paths are unique and there can be branches of many things to autocomplete
+// 	idenfitying boundaries between input scopes
+//  boundary for each sequence
+// 	all nodes involved in the creation of pattern x have a pattern id
+// 	pattern id with largest # of successfull relative order predictions matching with the input
+// 	initial construsction rule
+// 	letter first
+//	word second
+// 	distinctiveness, importance
 //	make sorted list of nodes from sequence prev and current in assending order using occurrence count
 //	remove nodes on the list where frquency ratio is out of bounds
 //	take remaining nodes on the list and make 1 parent node they all connect it (typical sequence)
+//
 // if parent of nodes exists
+//
 //	activated nodes move to parent
 //	activate parent
 //	parent's nexts are the predictions to write with dft
+// 	if input is still being read then correct predictions connect to the next parent from input
 //	repeat increase ocurrence count step
 //
 // assumptions
@@ -589,7 +614,8 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 //	all input data is used to write down the next expected data as a prediction
 //		the program code predictions are predetermined
 //		the user data predictions use earlier entered data subjected to the frequency ratio out of bounds rule
-//	all pgoram code must take unique paths even when paths run the same subpath at the same time
+//	all program code must take unique paths even when paths run the same subpath at the same time
+//	all loops are running the same subsequence before and after different nodes for a finite length path
 
 func Hierarchy() {
 
