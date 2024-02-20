@@ -594,8 +594,8 @@ func FindPattern(sequence string) string {
 // 	sequences
 // make hierarchy of groups
 // using the same node >= 2 times in 1 sequence makes squence of 2 parents above the node
-// 2, 1+1 == make new group (learn first)
-// 3, 1+1+1+1 == make new group (learn first)
+// 2, 1+1 == make new group as no group exists for 2, 1+1 (learn first)
+// 3, 1+1+1+1 == make new group, as no group exists for 3, 1+1+1 (learn first)
 // 2, 3 == rejected as 2, 3 have different parents and there is no extra context (fact check)
 // R, 2, 3 == make new group above R, 2, 3 as 2, 3 have different parents (learn deeper)
 // 2, 1+1+1-1 == add 1+1+1-1 to group that includes 2 (learn extra)
