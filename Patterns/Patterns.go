@@ -590,6 +590,16 @@ func FindPattern(sequence string) string {
 	return sequence // Return the entire sequence if no repeating pattern is found
 }
 
+// time tree
+// 	sequences
+// make hierarchy of groups
+// using the same node >= 2 times in 1 sequence makes squence of 2 parents above the node
+// 2, 1+1 == make new group (learn first)
+// 3, 1+1+1+1 == make new group (learn first)
+// 2, 3 == rejected as 2, 3 have different parents and there is no extra context (fact check)
+// R, 2, 3 == make new group above R, 2, 3 as 2, 3 have different parents (learn deeper)
+// 2, 1+1+1-1 == add 1+1+1-1 to group that includes 2 (learn extra)
+
 // "1+1", "2" are members of tribe A
 // "1+1+1", "3" are members of tribe B
 // neither member of each tribe can steal a member of another tribe
