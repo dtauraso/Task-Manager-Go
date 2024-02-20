@@ -1,10 +1,27 @@
 package main
 
-import "Task-Manager-Go/Patterns"
+import (
+	"Task-Manager-Go/Patterns"
+	"fmt"
+)
 
 func main() {
 
-	Patterns.Hierarchy()
+	// Patterns.Hierarchy()
+	sequence := "abcabcabcabc"
+	pattern := Patterns.FindPattern(sequence)
+	fmt.Println("Identified Pattern:", pattern)
+	// Patterns.Hierarchy()
+	sequence = "1+1+1-11+1+1-1"
+	pattern = Patterns.FindPattern(sequence)
+	fmt.Println("Identified Pattern:", pattern)
+	// Patterns.Hierarchy()
+	sequence = "1-1+1+11-1+1+1"
+	pattern = Patterns.FindPattern(sequence)
+	fmt.Println("Identified Pattern:", pattern)
+	sequence = "abcabcabcxabcabcabcx"
+	pattern = Patterns.FindPattern(sequence)
+	fmt.Println("Identified Pattern:", pattern)
 	// Fix the undefined patterns error
 	// Patterns.Pattern()
 }

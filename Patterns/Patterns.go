@@ -567,10 +567,37 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 	return parentNodeId
 }
 
+// FindPattern attempts to identify the most repeated pattern in the sequence.
+func FindPattern(sequence string) string {
+
+	sequenceLength := len(sequence)
+
+	for length := 1; length <= sequenceLength/2; length++ {
+		if sequenceLength%length == 0 {
+			matched := true
+			pattern := sequence[:length]
+			for i := length; i < sequenceLength; i += length {
+				if sequence[i:i+length] != pattern {
+					matched = false
+					break
+				}
+			}
+			if matched {
+				return pattern
+			}
+		}
+	}
+	return sequence // Return the entire sequence if no repeating pattern is found
+}
+
 // "1+1", "2" are members of tribe A
 // "1+1+1", "3" are members of tribe B
 // neither member of each tribe can steal a member of another tribe
 // a new tribe can be make of members of any 2 tribes using "" before the members of each tribe: "", "1+1", "3"
+// a in A can be put in B if f(a) = b in B
+// if prediction succeeds add or connect the parent nodes of the successfull child prediction
+// next round, parent instance at t+1 can make guesses of all the possible children (single digit for add)
+// 	as long as the expected prediction is a number than 1 of the guesses will be correct
 
 // 2 different things are the same if they end at the same self-consistent place
 // how to save a sequence that is the logical computing
