@@ -596,9 +596,14 @@ func FindPattern(sequence string) string {
 // using the same node >= 2 times in 1 sequence makes squence of 2 parents above the node
 // 2, 1+1 == make new group as no group exists for 2, 1+1 (learn first)
 // 3, 1+1+1+1 == make new group, as no group exists for 3, 1+1+1 (learn first)
-// 2, 3 == rejected as 2, 3 have different parents and there is no extra context (fact check)
-// R, 2, 3 == make new group above R, 2, 3 as 2, 3 have different parents (learn deeper)
+// 2, 3 == rejected as 2, 3 have different immediate parents and there is no extra context (fact check)
+// R, 2, 3 == make new group above R, 2, 3 as 2, 3 have different immediate parents(the parents are not any nodes above each other) and R is new (learn deeper)
 // 2, 1+1+1-1 == add 1+1+1-1 to group that includes 2 (learn extra)
+// R, 2 == true as even though R and 2 have different immmediate parents, R's parent is at least 1 parent node above 2's parent (check depth of learn)
+// i == new group
+// I, i == new group above I, i
+// N, R, I == new group above N, R, I
+// N, I == true as parent(I) == N's parent
 
 // "1+1", "2" are members of tribe A
 // "1+1+1", "3" are members of tribe B
