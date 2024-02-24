@@ -529,16 +529,6 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 	prev := head
 	childIds := []int{}
 	fmt.Printf("%s\n", fmt.Sprintf("%T", sequence))
-	// tree entries off slightly
-	// make specific parent node for each different sequence visiting same subsequence
-	// make 1 node connecting to the specific parent nodes for sequences with variation that are the same
-	// at 1 point in time
-	// change where the read write heads are (repeat visitting same items
-	// write down the autocompleted sequence)
-	// autocomplete stops when sequence finishes last node
-	// bias in favor of patterns
-	// measure connection strength
-	// stronger connections dictate the order
 	switch sequence.(type) {
 	case []interface{}:
 		parentNodeId = len(*nodes) + len(sequence.([]interface{}))
@@ -566,115 +556,6 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 	*nodes = append(*nodes, &Node{Id: parentNodeId, Edges: map[string][]int{"children": childIds}})
 	return parentNodeId
 }
-
-// FindPattern attempts to identify the most repeated pattern in the sequence.
-func FindPattern(sequence string) string {
-
-	sequenceLength := len(sequence)
-
-	for length := 1; length <= sequenceLength/2; length++ {
-		if sequenceLength%length == 0 {
-			matched := true
-			pattern := sequence[:length]
-			for i := length; i < sequenceLength; i += length {
-				if sequence[i:i+length] != pattern {
-					matched = false
-					break
-				}
-			}
-			if matched {
-				return pattern
-			}
-		}
-	}
-	return sequence // Return the entire sequence if no repeating pattern is found
-}
-
-// time tree
-// 	sequences
-// make hierarchy of groups
-// using the same node >= 2 times in 1 sequence makes squence of 2 parents above the node
-// 2, 1+1 == make new group as no group exists for 2, 1+1 (learn first)
-// 3, 1+1+1+1 == make new group, as no group exists for 3, 1+1+1 (learn first)
-// 2, 3 == rejected as 2, 3 have different immediate parents and there is no extra context (fact check)
-// R, 2, 3 == make new group above R, 2, 3 as is 2, 3 have different immediate parents(the parents are not any nodes above each other) and R is new (learn deeper)
-// 2, 1+1+1-1 == add 1+1+1-1 to group that includes 2 (learn extra)
-// R, 2 == true as even though R and 2 have different immmediate parents, R's parent is at least 1 parent node above 2's parent (check depth of learn)
-// i == new group
-// I, i == new group above I, i
-// N, R, I == new group above N, R, I
-// N, I == true as parent(I) == N's parent
-// _, 2, 3 = 2, 3 are a group as "_" says they can be a group despite having different parents (learn across)
-
-// "1+1", "2" are members of tribe A
-// "1+1+1", "3" are members of tribe B
-// neither member of each tribe can steal a member of another tribe
-// a new tribe can be make of members of any 2 tribes using "" before the members of each tribe: "", "1+1", "3"
-// a in A can be put in B if f(a) = b in B
-// if prediction succeeds add or connect the parent nodes of the successfull child prediction
-// next round, parent instance at t+1 can make guesses of all the possible children (single digit for add)
-// 	as long as the expected prediction is a number than 1 of the guesses will be correct
-
-// 2 different things are the same if they end at the same self-consistent place
-// how to save a sequence that is the logical computing
-// 1 parent node for a typical sequence (typical sequence is "key", like the letters in Bottom are)
-// n parent nodes above the 1 parent nodes for sequences that include the typical sequence
-// predict by letter and by ith time step (what was seen at time step i last time)
-// "1+1" == "2", "1+1+1" == "3"
-// "l#+#=##"
-// "l#+#+#=###"
-// "+" means connect
-// "=" means refer earlier sequence to show both are the same (reject if sequences differ)
-// "l#+#+#=##" is false
-// "p#+#+#=##" is true
-// removed barrier and the sequences were not distinguishable
-// awareness restriction and localization
-// self-consistent: P=P
-// Logic connects premisses (assumptions) to a conclusion in an unerring way.
-// Logic can only prove that conclusions are impossible if the conclusion requires mutually contradictory assumptions
-// how to prove 2 sequences are contradictory
-// doubly link new nodes
-// doubly link existing nodes with new path
-// may be more than 1 possible node that is asked to match with input
-// if the same sequence of length > 1 is revsited from a different starting point
-//
-//	make sequence a child sequence with 1 parent node for each starting point
-//
-// increase occurrence count for new nodes(1) and revisiting nodes(x + 1)
-// if first and last node have a frequency ratio too far apart
-// 	assumes we can isolate all of the nodes in the scope
-// 	what the next node is, what the next nodes are in the previous finite sequence
-// 	can't assume all paths are unique and there can be branches of many things to autocomplete
-// 	idenfitying boundaries between input scopes
-//  boundary for each sequence
-// 	all nodes involved in the creation of pattern x have a pattern id
-// 	pattern id with largest # of successfull relative order predictions matching with the input
-// 	initial construsction rule
-// 	letter first
-//	word second
-// 	distinctiveness, importance
-//	make sorted list of nodes from sequence prev and current in assending order using occurrence count
-//	remove nodes on the list where frquency ratio is out of bounds
-//	take remaining nodes on the list and make 1 parent node they all connect it (typical sequence)
-//
-// if parent of nodes exists
-//
-//	activated nodes move to parent
-//	activate parent
-//	parent's nexts are the predictions to write with dft
-// 	if input is still being read then correct predictions connect to the next parent from input
-//	repeat increase ocurrence count step
-//
-// assumptions
-//
-//	most of the data will not have randomness
-//	the data is the program code and user entered data
-//	user either adds new data or revisits existing data
-//	all input data is used to write down the next expected data as a prediction
-//		the program code predictions are predetermined
-//		the user data predictions use earlier entered data subjected to the frequency ratio out of bounds rule
-//	all program code must take unique paths even when paths run the same subpath at the same time
-//	all loops are running the same subsequence before and after different nodes for a finite length path
 
 func Hierarchy() {
 
