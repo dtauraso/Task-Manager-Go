@@ -557,6 +557,14 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 	return parentNodeId
 }
 
+func costReducer() {
+
+	// different data increases cost
+	// known data removes cost
+	// cost affects reading speed
+	// higher cost means reading is more likely to skip over input
+
+}
 func Hierarchy() {
 
 	// _ = doublyLinkSequence(&nodes, &Bottom, "title")
