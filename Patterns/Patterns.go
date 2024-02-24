@@ -563,6 +563,11 @@ func costReducer() {
 	// known data removes cost
 	// cost affects reading speed
 	// higher cost means reading is more likely to skip over input
+	// save reading rate, input[i], all i's to buffer
+	// the buffer entry that has occurred 10% more than any other entry is saved to storage
+	// if the reading rate is > 1 for any saved item after input is read the data stored is likely less accurate
+	// 	go to first index saved. read at speed 1 from first index to last index
+	//	saved to buffer and then to storage same way
 
 }
 func Hierarchy() {
