@@ -557,6 +557,21 @@ func doublyLinkSequence(nodes *[]*Node, Bottom *map[string][]int, sequence inter
 	return parentNodeId
 }
 
+type Account struct {
+	amount int
+}
+
+func (a *Account) add(amount int) {
+
+}
+func (a *Account) remove(amount int) {
+
+}
+
+type Read struct {
+	speed int
+}
+
 func costReducer() {
 
 	// different data increases cost
@@ -568,6 +583,11 @@ func costReducer() {
 	// if the reading rate is > 1 for any saved item after input is read the data stored is likely less accurate
 	// 	go to first index saved. read at speed 1 from first index to last index
 	//	saved to buffer and then to storage same way
+	// need finite amount to use
+	// amount is used up as a cost
+	// amount is added back when cost is removed
+	// low or higher amount changes read speed as known things recharge amount
+	// goal is to keep amount > 0
 
 }
 func Hierarchy() {
