@@ -593,6 +593,8 @@ type Data struct {
 	// monitor changes of data accesses
 	// reduce cost by make 1 higher level with most frequently accessed item
 	// if change of data access sends to the same parent then there is signficantly less aditional cost
+	// record the most frequent item last seen
+	// write to the input when the cost is very high
 }
 
 func costReducer() {
