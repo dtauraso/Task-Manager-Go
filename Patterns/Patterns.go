@@ -564,12 +564,35 @@ type Account struct {
 func (a *Account) add(amount int) {
 
 }
+
 func (a *Account) remove(amount int) {
 
 }
 
 type Read struct {
 	speed int
+}
+
+func (r *Read) add(amount int) {
+
+}
+
+func (r *Read) remove(amount int) {
+
+}
+
+type Item struct {
+	item          string
+	readingRate   int
+	itemLocations []int
+}
+type Data struct {
+	data     map[string]Item
+	children []*Data
+	// internal change monitor
+	// monitor changes of data accesses
+	// reduce cost by make 1 higher level with most frequently accessed item
+	// if change of data access sends to the same parent then there is signficantly less aditional cost
 }
 
 func costReducer() {
@@ -588,6 +611,10 @@ func costReducer() {
 	// amount is added back when cost is removed
 	// low or higher amount changes read speed as known things recharge amount
 	// goal is to keep amount > 0
+	// less frequent items are "buffer"
+	// more frequent items are "storage"
+	// the input changing is cost
+	// reading the saved data
 
 }
 func Hierarchy() {
