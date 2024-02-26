@@ -582,20 +582,27 @@ func (r *Read) remove(amount int) {
 }
 
 type Item struct {
-	item          string
-	readingRate   int
-	itemLocations []int
+	item                string
+	readingRate         int
+	itemLocations       []int
+	costReductionAmount int
 }
+
 type Data struct {
-	data     map[string]Item
-	children []*Data
+	id       int
+	data     map[string]*Item
+	children []int
+	parents  []int
 	// internal change monitor
 	// monitor changes of data accesses
 	// reduce cost by make 1 higher level with most frequently accessed item
 	// if change of data access sends to the same parent then there is signficantly less aditional cost
 	// record the most frequent item last seen
 	// write to the input when the cost is very high
+
 }
+
+var tree = []*Data{}
 
 func costReducer() {
 
