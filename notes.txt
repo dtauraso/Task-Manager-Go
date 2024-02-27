@@ -135,3 +135,4 @@ https://ebitengine.org/en/examples/
 //		the user data predictions use earlier entered data subjected to the frequency ratio out of bounds rule
 //	all program code must take unique paths even when paths run the same subpath at the same time
 //	all loops are running the same subsequence before and after different nodes for a finite length path
+

@@ -1,10 +1,108 @@
 package main
 
-import "Task-Manager-Go/Patterns"
+import (
+	// "Task-Manager-Go/Patterns"
+	// "github.com/hexops/vecty"
+	// "github.com/hexops/vecty/elem"
+	"io"
+	"net/http"
+	"text/template"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"golang.org/x/time/rate"
+)
+
+// type MyComponent struct {
+// 	vecty.Core
+// }
+
+// func (mc *MyComponent) Render() vecty.ComponentOrHTML {
+// 	return elem.Div(
+// 		vecty.Markup(vecty.Class("my-main-container")),
+// 		vecty.Text("Welcome to my site"),
+// 	)
+// }
+
+// func (mc *MyComponent) Render() vecty.ComponentOrHTML {
+// 	return elem.Body(
+// 		&MyChildComponent{},
+// 		vecty.Text("some footer text"),
+// 	)
+// }
+
+// Handler
+// func hello(c echo.Context) error {
+// 	return c.String(http.StatusOK, "Hello, World!")
+// }
+
+type Template struct {
+	Templates *template.Template
+}
+
+func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	return t.Templates.ExecuteTemplate(w, name, data)
+}
+
+func NewTemplateRenderer(e *echo.Echo, paths ...string) {
+	tmpl := &template.Template{}
+	for i := range paths {
+		template.Must(tmpl.ParseGlob(paths[i]))
+	}
+	t := newTemplate(tmpl)
+	e.Renderer = t
+}
+
+func newTemplate(templates *template.Template) echo.Renderer {
+	return &Template{
+		Templates: templates,
+	}
+}
 
 func main() {
 
-	Patterns.Hierarchy()
+	e := echo.New()
+
+	// Little bit of middlewares for housekeeping
+	e.Pre(middleware.RemoveTrailingSlash())
+	e.Use(middleware.Recover())
+	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(
+		rate.Limit(20),
+	)))
+	// This will initiate our template renderer
+	NewTemplateRenderer(e, "public/*.html")
+	e.GET("/hello", func(c echo.Context) error {
+		res := map[string]interface{}{
+			"Name":  "Wyndham",
+			"Phone": "8888888",
+			"Email": "skyscraper@gmail.com",
+		}
+		return c.Render(http.StatusOK, "index", res)
+	})
+	e.GET("/get-info", func(c echo.Context) error {
+		res := map[string]interface{}{
+			"Name":  "Wyndam",
+			"Phone": "8888888",
+			"Email": "skyscraper@gmail.com",
+		}
+		return c.Render(http.StatusOK, "name_card", res)
+	})
+	e.Static("/dist", "dist")
+	e.Logger.Fatal(e.Start(":8080"))
+	// vecty.RenderBody(&MyComponent{})
+	// Echo instance
+	// e := echo.New()
+
+	// // Middleware
+	// e.Use(middleware.Logger())
+	// e.Use(middleware.Recover())
+
+	// // Routes
+	// e.GET("/", hello)
+
+	// // Start server
+	// e.Logger.Fatal(e.Start(":1323"))
+	// Patterns.Hierarchy()
 	// Fix the undefined patterns error
 	// Patterns.Pattern()
 }
