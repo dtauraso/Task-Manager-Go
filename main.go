@@ -4,13 +4,14 @@ import (
 	// "Task-Manager-Go/Patterns"
 	// "github.com/hexops/vecty"
 	// "github.com/hexops/vecty/elem"
+	"Task-Manager-Go/Patterns"
 	"io"
-	"net/http"
+	// "net/http"
 	"text/template"
 
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"golang.org/x/time/rate"
+	// "github.com/labstack/echo/v4/middleware"
+	// "golang.org/x/time/rate"
 )
 
 // type MyComponent struct {
@@ -61,34 +62,35 @@ func newTemplate(templates *template.Template) echo.Renderer {
 
 func main() {
 
-	e := echo.New()
+	// e := echo.New()
 
-	// Little bit of middlewares for housekeeping
-	e.Pre(middleware.RemoveTrailingSlash())
-	e.Use(middleware.Recover())
-	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(
-		rate.Limit(20),
-	)))
-	// This will initiate our template renderer
-	NewTemplateRenderer(e, "public/*.html")
-	e.GET("/hello", func(c echo.Context) error {
-		res := map[string]interface{}{
-			"Name":  "Wyndham",
-			"Phone": "8888888",
-			"Email": "skyscraper@gmail.com",
-		}
-		return c.Render(http.StatusOK, "index", res)
-	})
-	e.GET("/get-info", func(c echo.Context) error {
-		res := map[string]interface{}{
-			"Name":  "Wyndam",
-			"Phone": "8888888",
-			"Email": "skyscraper@gmail.com",
-		}
-		return c.Render(http.StatusOK, "name_card", res)
-	})
-	e.Static("/dist", "dist")
-	e.Logger.Fatal(e.Start(":8080"))
+	// // Little bit of middlewares for housekeeping
+	// e.Pre(middleware.RemoveTrailingSlash())
+	// e.Use(middleware.Recover())
+	// e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(
+	// 	rate.Limit(20),
+	// )))
+	// // This will initiate our template renderer
+	// NewTemplateRenderer(e, "public/*.html")
+	// e.GET("/hello", func(c echo.Context) error {
+	// 	res := map[string]interface{}{
+	// 		"Name":  "Wyndham",
+	// 		"Phone": "8888888",
+	// 		"Email": "skyscraper@gmail.com",
+	// 	}
+	// 	return c.Render(http.StatusOK, "index", res)
+	// })
+	// e.GET("/get-info", func(c echo.Context) error {
+	// 	res := map[string]interface{}{
+	// 		"Name":  "Wyndam",
+	// 		"Phone": "8888888",
+	// 		"Email": "skyscraper@gmail.com",
+	// 	}
+	// 	return c.Render(http.StatusOK, "name_card", res)
+	// })
+	// e.Static("/dist", "dist")
+	// e.Logger.Fatal(e.Start(":8080"))
+	Patterns.MakeTree()
 	// vecty.RenderBody(&MyComponent{})
 	// Echo instance
 	// e := echo.New()

@@ -18,7 +18,7 @@
     <p>Hello, World!</p>
     <div id="user-info">
         <p {{if eq .Name "Wyndham" }} class="red" {{end}}>{{.Name}}</p>
-        <button hx-get="/get-info" hx-target="#user-info" hx-swap="innerHTML">Reveal Info</button>
+        <button hx-get="/get-info" hx-target="#user-info" hx-swap="innerHTML" onclick="">Reveal Info</button>
 
     </div>
 </body>
