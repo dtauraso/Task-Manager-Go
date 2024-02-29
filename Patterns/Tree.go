@@ -53,7 +53,8 @@ func dft(nodeId int, level int) {
 func MakeTree() {
 	taskTitleId := newNode2(&nodes2, "task title", nil, -1)
 	taskTitleAttributeId := newNode2(&nodes2, title, nil, taskTitleId)
-	taskTagsId := newNode2(&nodes2, "task tag", nil, -1)
+	taskTags2Id := newNode2(&nodes2, "task tag 2", nil, -1)
+	taskTagsId := newNode2(&nodes2, "task tag", nil, taskTags2Id)
 	taskTagsAttributeId := newNode2(&nodes2, tags, nil, taskTagsId)
 	taskTitleRootId := newNode2(&nodes2, "title field", []int{taskTitleAttributeId}, -1)
 	taskTagsRootId := newNode2(&nodes2, "tags field", []int{taskTagsAttributeId}, -1)
