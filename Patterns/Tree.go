@@ -1,6 +1,9 @@
 package Patterns
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type Node2 struct {
 	id       int
@@ -33,10 +36,24 @@ const (
 	tags  = "tags"
 )
 
+func dft(nodeId int, level int) {
+	if nodeId == -1 {
+		return
+	}
+	node := nodes2[nodeId]
+	indent := strings.Repeat(" ", level*2)
+	fmt.Printf("%s%s\n", indent, node.value)
+	for _, childId := range node.children {
+		dft(childId, level+1)
+
+	}
+	dft(node.next, level)
+}
+
 func MakeTree() {
 	taskTitleId := newNode2(&nodes2, "task title", nil, -1)
 	taskTitleAttributeId := newNode2(&nodes2, title, nil, taskTitleId)
-	taskTagsId := newNode2(&nodes2, "task tag", nil, taskTitleId)
+	taskTagsId := newNode2(&nodes2, "task tag", nil, -1)
 	taskTagsAttributeId := newNode2(&nodes2, tags, nil, taskTagsId)
 	rootId := newNode2(
 		&nodes2,
@@ -44,9 +61,7 @@ func MakeTree() {
 		[]int{taskTitleAttributeId, taskTagsAttributeId},
 		-1,
 	)
-	for _, node := range nodes2 {
-		fmt.Printf("Node ID: %d, Value: %s, Children: %v, Next: %d\n", node.id, node.value, node.children, node.next)
-	}
 
-	fmt.Printf("%v\n", rootId)
+	dft(rootId, 0)
+
 }
