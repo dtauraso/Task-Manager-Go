@@ -9,33 +9,41 @@ type Node2 struct {
 	value    string
 }
 
-var nodes2 = map[int]*Node2{}
+var nodes2 = []*Node2{}
 
 func newNode2(
-	nodes *map[int]*Node2,
-	id int,
+	nodes *[]*Node2,
+	value string,
 	children []int,
 	next int,
-	value string) int {
+) int {
 
 	newNodeId := len(*nodes)
-	(*nodes)[newNodeId] = &Node2{
+	(*nodes) = append(*nodes, &Node2{
 		id:       newNodeId,
 		children: children,
 		next:     next,
-		value:    value}
+		value:    value})
 
 	return newNodeId
 }
 
+const (
+	title = "title"
+	tags  = "tags"
+)
+
 func MakeTree() {
+	taskTitleId := newNode2(&nodes2, "task title", nil, -1)
+	taskTitleAttributeId := newNode2(&nodes2, title, nil, taskTitleId)
+	taskTagsId := newNode2(&nodes2, "task tag", nil, taskTitleId)
+	taskTagsAttributeId := newNode2(&nodes2, tags, nil, taskTagsId)
 	rootId := newNode2(
 		&nodes2,
-		0,
-		[]int{newNode2(&nodes2, 1, nil, 2, "child1"),
-			newNode2(&nodes2, 2, nil, 3, "child2")},
-		3,
-		"root")
+		"title field",
+		[]int{taskTitleAttributeId, taskTagsAttributeId},
+		-1,
+	)
 	for _, node := range nodes2 {
 		fmt.Printf("Node ID: %d, Value: %s, Children: %v, Next: %d\n", node.id, node.value, node.children, node.next)
 	}
