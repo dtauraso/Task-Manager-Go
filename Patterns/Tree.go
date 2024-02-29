@@ -55,13 +55,17 @@ func MakeTree() {
 	taskTitleAttributeId := newNode2(&nodes2, title, nil, taskTitleId)
 	taskTagsId := newNode2(&nodes2, "task tag", nil, -1)
 	taskTagsAttributeId := newNode2(&nodes2, tags, nil, taskTagsId)
+	taskTitleRootId := newNode2(&nodes2, "title field", []int{taskTitleAttributeId}, -1)
+	taskTagsRootId := newNode2(&nodes2, "tags field", []int{taskTagsAttributeId}, -1)
 	rootId := newNode2(
 		&nodes2,
-		"title field",
-		[]int{taskTitleAttributeId, taskTagsAttributeId},
+		"task",
+		[]int{taskTitleRootId, taskTagsRootId},
 		-1,
 	)
-
+	previewId := newNode2(&nodes2, "preview", []int{taskTitleId, taskTagsId}, -1)
 	dft(rootId, 0)
+	fmt.Printf("\n")
+	dft(previewId, 0)
 
 }
