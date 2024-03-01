@@ -12,17 +12,18 @@ type Node2 struct {
 	value    string
 }
 
-var nodes2 = []*Node2{}
+type Nodes2 struct {
+	nodes []*Node2
+}
 
-func newNode2(
-	nodes *[]*Node2,
+func (n *Nodes2) newNode2(
 	value string,
 	children []int,
 	next int,
 ) int {
 
-	newNodeId := len(*nodes)
-	(*nodes) = append(*nodes, &Node2{
+	newNodeId := len(n.nodes)
+	n.nodes = append(n.nodes, &Node2{
 		id:       newNodeId,
 		children: children,
 		next:     next,
@@ -31,42 +32,44 @@ func newNode2(
 	return newNodeId
 }
 
+func (n *Nodes2) dft(nodeId int, level int) {
+	if nodeId == -1 {
+		return
+	}
+	node := n.nodes[nodeId]
+	indent := strings.Repeat(" ", level*2)
+	fmt.Printf("%s%s\n", indent, node.value)
+	for _, childId := range node.children {
+		n.dft(childId, level+1)
+
+	}
+	n.dft(node.next, level)
+}
+
 const (
 	title = "title"
 	tags  = "tags"
 )
 
-func dft(nodeId int, level int) {
-	if nodeId == -1 {
-		return
-	}
-	node := nodes2[nodeId]
-	indent := strings.Repeat(" ", level*2)
-	fmt.Printf("%s%s\n", indent, node.value)
-	for _, childId := range node.children {
-		dft(childId, level+1)
-
-	}
-	dft(node.next, level)
-}
-
 func MakeTree() {
-	taskTitleId := newNode2(&nodes2, "task title", nil, -1)
-	taskTitleAttributeId := newNode2(&nodes2, title, nil, taskTitleId)
-	taskTags2Id := newNode2(&nodes2, "task tag 2", nil, -1)
-	taskTagsId := newNode2(&nodes2, "task tag", nil, taskTags2Id)
-	taskTagsAttributeId := newNode2(&nodes2, tags, nil, taskTagsId)
-	taskTitleRootId := newNode2(&nodes2, "title field", []int{taskTitleAttributeId}, -1)
-	taskTagsRootId := newNode2(&nodes2, "tags field", []int{taskTagsAttributeId}, -1)
-	rootId := newNode2(
-		&nodes2,
-		"task",
+
+	var nodes2 = Nodes2{}
+
+	taskTitleId := nodes2.newNode2("task title", nil, -1)
+	taskTitleAttributeId := nodes2.newNode2(title, nil, taskTitleId)
+	taskTags2Id := nodes2.newNode2("task tag 2", nil, -1)
+	taskTagsId := nodes2.newNode2("task tag", nil, taskTags2Id)
+	taskTagsAttributeId := nodes2.newNode2(tags, nil, taskTagsId)
+	taskTitleRootId := nodes2.newNode2("title field", []int{taskTitleAttributeId}, -1)
+	taskTagsRootId := nodes2.newNode2("tags field", []int{taskTagsAttributeId}, -1)
+	rootId := nodes2.newNode2(
+		"0",
 		[]int{taskTitleRootId, taskTagsRootId},
 		-1,
 	)
-	previewId := newNode2(&nodes2, "preview", []int{taskTitleId, taskTagsId}, -1)
-	dft(rootId, 0)
+	previewId := nodes2.newNode2("0", []int{taskTitleId, taskTagsId}, -1)
+	nodes2.dft(rootId, 0)
 	fmt.Printf("\n")
-	dft(previewId, 0)
+	nodes2.dft(previewId, 0)
 
 }
