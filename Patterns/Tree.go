@@ -63,8 +63,11 @@ const (
 
 func MakeTree() {
 
-	var nodes2 = Nodes2{}
-
+	nodes2 := Nodes2{}
+	views := []string{"today"}
+	lists := map[string]int{"todayStart": -1, "todayEnd": -1}
+	taskViews := nodes2.addTask(Task{}, views, lists)
+	fmt.Printf("%v\n", taskViews)
 	taskTitleId := nodes2.newNode2("task title", nil, -1)
 	taskTitleAttributeId := nodes2.newNode2(title, nil, taskTitleId)
 	taskTags2Id := nodes2.newNode2("task tag 2", nil, -1)
