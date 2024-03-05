@@ -48,6 +48,16 @@ func (n *Nodes2) dft(nodeId int, level int) {
 
 func (n *Nodes2) addTask(task Task, views []string, lists map[string]int) (taskViews map[string]int) {
 
+	for i := 0; i < len(views); i++ {
+		switch views[i] {
+		case "today":
+			// preview of task
+
+		default:
+
+		}
+	}
+
 	return map[string]int{}
 }
 
@@ -65,7 +75,9 @@ func MakeTree() {
 
 	nodes2 := Nodes2{}
 	views := []string{"today"}
-	lists := map[string]int{"todayStart": -1, "todayEnd": -1}
+	lists := map[string]int{
+		"todayStart": nodes2.newNode2("todayStart", nil, -1),
+		"todayEnd":   nodes2.newNode2("todayEnd", nil, -1)}
 	taskViews := nodes2.addTask(Task{}, views, lists)
 	fmt.Printf("%v\n", taskViews)
 	taskTitleId := nodes2.newNode2("task title", nil, -1)
