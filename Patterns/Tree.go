@@ -119,6 +119,74 @@ func (n *Nodes2) dft2(nodeId int, level int, successChan chan struct{}) {
 
 // // Wait for the traversal to complete
 // <-successChan
+// type XNode struct {
+// 	item
+// }
+
+var x1 = map[int]map[string]map[int]func(x interface{}, id int) bool{
+	0: {},
+	1: {"x0": {2: X}},
+	2: {"next": {3: X1}},
+	3: {"n0": {4: X1}},
+	4: {"next": {7: X1},
+		"child": {3: X1}},
+}
+
+var X = func(x interface{}, id int) bool {
+
+	// item := x.(map[int]map[string]map[int]func(x interface{}, id int) bool)[id]
+	return true
+}
+var X1 = func(x interface{}, id int) bool {
+	return true
+}
+
+func traverseX1(x1 map[int]map[string]map[int]func(x interface{}, id int) bool, id int) bool {
+	if len(x1[id]) == 0 {
+		return true
+	}
+
+	item := x1[id]
+	var pass bool
+	child, hasChild := item["child"]
+	if hasChild {
+		pass = false
+		for singleKey := range child {
+			if traverseX1(x1, singleKey) {
+				pass = true
+			}
+		}
+	}
+	if !hasChild {
+
+	}
+	if !hasChild || pass {
+
+	}
+	for key, value := range x1[id] {
+		// pass := false
+		if key == "child" {
+			for singleKey := range value {
+				if traverseX1(x1, singleKey) {
+					pass = true
+				}
+			}
+		}
+
+		// for nextId, function := range value {
+		// 	if function(x1, id) {
+		// 		// if
+		// 		// /*value(id)*/ {
+		// 		// if traverseX1(x1, key) {
+		// 		// 	return true
+		// 		// }
+		// 	}
+		// }
+
+	}
+
+	return false
+}
 func MakeTree() {
 
 	// nodes2 := Nodes2{}
