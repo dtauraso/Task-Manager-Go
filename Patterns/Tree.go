@@ -2,6 +2,9 @@ package Patterns
 
 import (
 	"fmt"
+	"reflect"
+	"runtime"
+
 	// "runtime"
 	"strings"
 )
@@ -122,12 +125,14 @@ func (n *Nodes2) dft2(nodeId int, level int, successChan chan struct{}) {
 // <-successChan
 
 type Node3 struct {
-	next     map[string]map[int]func(x interface{}, id int, dataNodePtr *int) bool
-	children map[string]map[int]func(x interface{}, id int, dataNodePtr *int) bool
+	// only 1 next
+	next map[string]map[int]func(x interface{}, id int, dataNodePtr *int, changes *DataChange) bool
+	// n children to try
+	children map[string]map[int]func(x interface{}, id int, dataNodePtr *int, changes *DataChange) bool
 }
 
-func Init(name string, nextNodeId int, function func(x interface{}, id int, dataNodePtr *int) bool) map[string]map[int]func(x interface{}, id int, dataNodePtr *int) bool {
-	return map[string]map[int]func(x interface{}, id int, dataNodePtr *int) bool{name: {nextNodeId: function}}
+func Init(name string, nextNodeId int, function func(x interface{}, id int, dataNodePtr *int, changes *DataChange) bool) map[string]map[int]func(x interface{}, id int, dataNodePtr *int, changes *DataChange) bool {
+	return map[string]map[int]func(x interface{}, id int, dataNodePtr *int, changes *DataChange) bool{name: {nextNodeId: function}}
 }
 
 var x1 = map[int]*Node3{
@@ -137,45 +142,72 @@ var x1 = map[int]*Node3{
 		children: Init("x1", 5, X1)},
 }
 
-var X = func(x interface{}, id int, dataNodePtr *int) bool {
+var X = func(x interface{}, id int, dataNodePtr *int, changes *DataChange) bool {
 
 	// item := x.(map[int]map[string]map[int]func(x interface{}, id int) bool)[id]
 	return true
 }
-var X1 = func(x interface{}, id int, dataNodePtr *int) bool {
+var X1 = func(x interface{}, id int, dataNodePtr *int, changes *DataChange) bool {
 	return true
 }
 
-func traverseX1(x1 map[int]map[string]map[int]func(x interface{}, id int, dataNodePtr *int) bool, id int, dataNodePtr *int) {
+type DataChange struct {
+	id               int
+	nextNodeName     string
+	nextFunctionName string
+	beforeAfter      map[string]string
+	nextIsChild      bool
+}
+
+func structAttributeExists(s interface{}, attributeName string) bool {
+	v := reflect.ValueOf(s)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	_, found := v.Type().FieldByName(attributeName)
+	return found
+}
+
+func traverseX1(
+	x1 map[int]*Node3,
+	id int,
+	dataNodePtr *int,
+	changes *[]*DataChange) {
 	// if len(x1[id]) == 0 {
 	// return true
 	// }
-	/*
-	   record of data changes
-	   id of item
-	   	name of next node "x0"
-	   	name of function
-	   	direction "next" or "child"
-	   	collection of (before, after) strings from function
-	*/
+
 	item := x1[id]
-	var pass bool
-	child, hasChild := item["child"]
-	// var nextNodeId int
-	if hasChild {
+	// var pass bool
+	if structAttributeExists(item, "children") {
+		child := item.children
 		pass := false
+		var childChanges map[string]*DataChange
+		passingKey := ""
 		for key := range child {
-			// pc, _, _, _ := runtime.Caller(0)
-			// functionName := runtime.FuncForPC(pc).Name()
-			if child[key](x1, key, dataNodePtr) {
-				pass = true
-				traverseX1(x1, key, dataNodePtr)
+			pc, _, _, _ := runtime.Caller(0)
+			functionName := runtime.FuncForPC(pc).Name()
+			childChanges[key] = &DataChange{id: id, nextNodeName: key, nextFunctionName: functionName, nextIsChild: true}
+			for nextNodeId := range child[key] {
+				if child[key][nextNodeId](x1, nextNodeId, dataNodePtr, childChanges[key]) {
+					pass = true
+					passingKey = key
+					traverseX1(x1, nextNodeId, dataNodePtr, changes)
+				}
 			}
 		}
-		if !pass {
-			// return false
+		if pass {
+			*changes = append(*changes, childChanges[passingKey])
+		} else {
+			for _, change := range childChanges {
+				*changes = append(*changes, change)
+			}
 		}
+
 	}
+
+	// var nextNodeId int
+
 	var functionPass bool
 	// for key := range child {
 	// 	functionPass = child[key](x1, key)
@@ -187,33 +219,33 @@ func traverseX1(x1 map[int]map[string]map[int]func(x interface{}, id int, dataNo
 	// if !hasNext {
 	// return true
 	// }
-	if !hasChild {
+	// if !hasChild {
 
-	}
-	if !hasChild || pass {
+	// }
+	// if !hasChild || pass {
 
-	}
-	for key, _ := range x1[id] {
-		// pass := false
-		if key == "child" {
-			// for singleKey := range value {
-			// 	// if traverseX1(x1, singleKey) {
-			// 	// 	pass = true
-			// 	// }
-			// }
-		}
+	// }
+	// for key, _ := range x1[id] {
+	// pass := false
+	// if key == "child" {
+	// for singleKey := range value {
+	// 	// if traverseX1(x1, singleKey) {
+	// 	// 	pass = true
+	// 	// }
+	// }
+	// }
 
-		// for nextId, function := range value {
-		// 	if function(x1, id) {
-		// 		// if
-		// 		// /*value(id)*/ {
-		// 		// if traverseX1(x1, key) {
-		// 		// 	return true
-		// 		// }
-		// 	}
-		// }
+	// for nextId, function := range value {
+	// 	if function(x1, id) {
+	// 		// if
+	// 		// /*value(id)*/ {
+	// 		// if traverseX1(x1, key) {
+	// 		// 	return true
+	// 		// }
+	// 	}
+	// }
 
-	}
+	// }
 
 	// return false
 }
@@ -244,7 +276,7 @@ func MakeTree() {
 	// nodes2.dft(previewId, 0)
 	// Create a sample tree structure
 	nodes2 := Nodes2{}
-	rootNodeID := nodes2.newNode2("Root", []int{1, 2}, -1)
+	// rootNodeID := nodes2.newNode2("Root", []int{1, 2}, -1)
 	node1ID := nodes2.newNode2("Node 1", []int{3, 4}, -1)
 	node2ID := nodes2.newNode2("Node 2", []int{5}, -1)
 	node3ID := nodes2.newNode2("Node 3", nil, -1)
@@ -259,7 +291,9 @@ func MakeTree() {
 
 	// Run the depth-first traversal on the tree starting from the root node
 	successChan := make(chan struct{})
-	go nodes2.dft2(rootNodeID, 0, successChan)
+	// changes := []DataChange{}
+	// dataPtr := 0
+	// traverseX1(rootNodeID, 0, successChan, &dataPtr, &changes)
 
 	// Wait for the traversal to complete
 	<-successChan
