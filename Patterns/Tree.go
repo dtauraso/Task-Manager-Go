@@ -134,11 +134,11 @@ type Node3 struct {
 	id   int
 	name string
 	// nil if len(childrenNodes) > 0
-	function       func(x map[int]*Node3, dataNodeId *int) int
+	function       func(x map[int]*Node3, controlFlowNodeId int, dataNodeId *int) int
 	functionPassed bool
 
-	beforeAfterList []map[string]string
-
+	beforeAfterList            []map[string]string
+	dataNodeIdPerFunctionVisit []int
 	// only 1 next
 	nextNodeId int
 	// n children to try
@@ -159,29 +159,34 @@ var x1 = map[int]*Node3{
 	7: {name: "1"},
 }
 
-func SetNode3(node *Node3, after string) {
-
+// need the control flow node to be connected to the data node ids
+func SetNode3(x map[int]*Node3, controlFlowNodeId int, dataNodeId *int, after string) {
+	node := x[controlFlowNodeId]
 	if !structAttributeExists(node, "beforeAfterList") {
 		node.beforeAfterList = []map[string]string{}
 	}
 	node.beforeAfterList = append(node.beforeAfterList, map[string]string{node.name: after})
+	if !structAttributeExists(node, "dataNodeIdPerFunctionVisit") {
+		node.dataNodeIdPerFunctionVisit = []int{}
+	}
+	node.dataNodeIdPerFunctionVisit = append(node.dataNodeIdPerFunctionVisit, *dataNodeId)
 	node.name = after
 }
 
-var X = func(x map[int]*Node3, dataNodePtr *int) int {
+var X = func(x map[int]*Node3, controlFlowNodeId int, dataNodeId *int) int {
 
-	itemId := x[*dataNodePtr].variables["varName"]
+	itemId := x[*dataNodeId].variables["varName"]
 	item := x[itemId]
 	index, _ := strconv.Atoi(item.name)
 	index += 1
 
-	SetNode3(item, strconv.Itoa(index))
+	SetNode3(x, controlFlowNodeId, dataNodeId, strconv.Itoa(index))
 
 	return 1
 }
 
-var X1 = func(x map[int]*Node3, dataNodePtr *int) int {
-	*dataNodePtr = x[*dataNodePtr].variables["containerVarName"]
+var X1 = func(x map[int]*Node3, controlFlowNodeId int, dataNodeId *int) int {
+	*dataNodeId = x[*dataNodeId].variables["containerVarName"]
 	return 1
 }
 
@@ -197,7 +202,7 @@ func structAttributeExists(s interface{}, attributeName string) bool {
 func traverseX1(
 	x1 map[int]*Node3,
 	id int,
-	dataNodePtr *int,
+	dataNodeId *int,
 ) int {
 
 	functionPassCount := 1
@@ -206,11 +211,21 @@ func traverseX1(
 		item := x1[id]
 		isChild := structAttributeExists(item, "children")
 		if !isChild {
-			functionPassCount += item.function(x1, dataNodePtr)
+			before := functionPassCount
+			functionPassCount += item.function(x1, id, dataNodeId)
+			after := functionPassCount - before
+			if after == 1 {
+				item.functionPassed = true
+			}
 		} else if isChild {
 			children := item.childrenNodeIds
 			for key := range children {
-				functionPassCount += traverseX1(x1, key, dataNodePtr)
+				before := functionPassCount
+				functionPassCount += traverseX1(x1, key, dataNodeId)
+				after := functionPassCount - before
+				if after == 1 {
+					break
+				}
 			}
 		}
 		if functionPassCount == 0 {
