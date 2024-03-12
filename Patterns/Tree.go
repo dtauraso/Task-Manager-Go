@@ -130,6 +130,7 @@ type NextNode struct {
 	id int
 	// function func(x map[int]*Node3, id int, dataNodePtr *int, changes *DataChange) bool
 }
+
 type Node3 struct {
 	id   int
 	name string
@@ -137,14 +138,29 @@ type Node3 struct {
 	function       func(x map[int]*Node3, controlFlowNodeId int, dataNodeId *int) int
 	functionPassed bool
 
-	beforeAfterList            []map[string]string
-	dataNodeIdPerFunctionVisit []int
+	beforeAfterList []map[string]string
+	dataNodeName    string
 	// only 1 next
 	nextNodeId int
 	// n children to try
 	childrenNodeIds []int
 
 	variables map[string]int
+}
+
+var circuitBreakerAttributes = map[int]*Node3{}
+
+var circuitBreakerTree = map[int]*Node3{
+	0: {name: "isInputThresholdReached", nextNodeId: 1},
+	1: {name: "waitingTillRequestSucceeds", nextNodeId: 9, childrenNodeIds: []int{2, 9}},
+	2: {name: "reachTargetTime", nextNodeId: 8, childrenNodeIds: []int{3, 7}},
+	3: {name: "before", nextNodeId: 4},
+	4: {name: "after", nextNodeId: 5},
+	5: {name: "computeWaitTimeDuration", nextNodeId: 6},
+	6: {name: "targetTimeIsNotReached", nextNodeId: 3},
+	7: {name: "targetTimeIsReached"},
+	8: {name: "requestFailed", nextNodeId: 3},
+	9: {name: "requestSucceeded"},
 }
 
 var x1 = map[int]*Node3{
@@ -166,10 +182,7 @@ func SetNode3(x map[int]*Node3, controlFlowNodeId int, dataNodeId *int, after st
 		node.beforeAfterList = []map[string]string{}
 	}
 	node.beforeAfterList = append(node.beforeAfterList, map[string]string{node.name: after})
-	if !structAttributeExists(node, "dataNodeIdPerFunctionVisit") {
-		node.dataNodeIdPerFunctionVisit = []int{}
-	}
-	node.dataNodeIdPerFunctionVisit = append(node.dataNodeIdPerFunctionVisit, *dataNodeId)
+	node.dataNodeName = x[*dataNodeId].name
 	node.name = after
 }
 
