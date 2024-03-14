@@ -145,22 +145,37 @@ type Node3 struct {
 	// n children to try
 	childrenNodeIds []int
 
-	variables map[string]int
+	value              int
+	variables          map[string]int
+	variableCollection []int
 }
 
-var circuitBreakerAttributes = map[int]*Node3{}
+var printToTerminalAttributes = map[int]*Node3{}
 
-var circuitBreakerTree = map[int]*Node3{
-	0: {name: "isInputThresholdReached", nextNodeId: 1},
-	1: {name: "waitingTillRequestSucceeds", nextNodeId: 9, childrenNodeIds: []int{2, 9}},
-	2: {name: "reachTargetTime", nextNodeId: 8, childrenNodeIds: []int{3, 7}},
-	3: {name: "before", nextNodeId: 4},
-	4: {name: "after", nextNodeId: 5},
-	5: {name: "computeWaitTimeDuration", nextNodeId: 6},
-	6: {name: "targetTimeIsNotReached", nextNodeId: 3},
-	7: {name: "targetTimeIsReached"},
-	8: {name: "requestFailed", nextNodeId: 3},
-	9: {name: "requestSucceeded"},
+const (
+	isInputThresholdReached    = 0
+	waitingTillRequestSucceeds = 1
+	reachTargetTime            = 2
+	before                     = 3
+	after                      = 4
+	computeWaitTimeDuration    = 5
+	targetTimeIsNotReached     = 6
+	targetTimeIsReached        = 7
+	requestFailed              = 8
+	requestSucceeded           = 9
+)
+
+var printToTerminalTree = map[int]*Node3{
+	isInputThresholdReached:    {name: "isInputThresholdReached", nextNodeId: waitingTillRequestSucceeds},
+	waitingTillRequestSucceeds: {name: "waitingTillRequestSucceeds", nextNodeId: requestSucceeded, childrenNodeIds: []int{reachTargetTime, requestSucceeded}},
+	reachTargetTime:            {name: "reachTargetTime", nextNodeId: requestFailed, childrenNodeIds: []int{before, targetTimeIsReached}},
+	before:                     {name: "before", nextNodeId: after},
+	after:                      {name: "after", nextNodeId: computeWaitTimeDuration},
+	computeWaitTimeDuration:    {name: "computeWaitTimeDuration", nextNodeId: targetTimeIsNotReached},
+	targetTimeIsNotReached:     {name: "targetTimeIsNotReached", nextNodeId: before},
+	targetTimeIsReached:        {name: "targetTimeIsReached"},
+	requestFailed:              {name: "requestFailed", nextNodeId: before},
+	requestSucceeded:           {name: "requestSucceeded"},
 }
 
 var x1 = map[int]*Node3{
