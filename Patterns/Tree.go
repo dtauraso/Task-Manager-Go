@@ -151,17 +151,35 @@ type Node3 struct {
 }
 
 const (
-	levelId = 0
+	levelId            = 0
+	parentStateHasNext = 1
+	levelIdNext        = 2
 )
 
 /*
+graphical nodes across and their distances
+
 a
-\→ b0
+\→ b0 ←←←←←←←←←
+   \→ c0      ↑
+      ↻\→ d0 ←↑←
+          ↓   ↑↑
+          e0 →↑↑
+   \→ c1       ↑
+	  ↓\→ d1 →→↑
+	  ↓	  ↓
+	  ↓   e1
+	  ↓\→ d3
+	  ↓   ↓
+	  ↓   e0
+	  c2
+	  ↓
+	  b0
+	  ↓
+	  e0
+	  ↓
+	  c3
    \→ e0
-   \→ c0
-      ↻\→ d0
-          ↓
-          e0
 \→ b1
 
 
