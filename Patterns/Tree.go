@@ -150,6 +150,24 @@ type Node3 struct {
 	variableCollection []int
 }
 
+const (
+	levelId = 0
+)
+
+/*
+a
+\→ b0
+   \→ e0
+   \→ c0
+      ↻\→ d0
+          ↓
+          e0
+\→ b1
+
+
+
+*/
+
 var printToTerminalAttributes = map[int]*Node3{}
 
 const (
