@@ -150,12 +150,6 @@ type Node3 struct {
 	variableCollection []int
 }
 
-const (
-	levelId            = 0
-	parentStateHasNext = 1
-	levelIdNext        = 2
-)
-
 /*
 graphical nodes across and their distances
 
@@ -186,32 +180,48 @@ a
 
 */
 
+const (
+	levelId            = 0
+	parentStateHasNext = 1
+	levelIdNext        = 2
+	// node maps to sequence of edge kinds horizontally from other nodes
+)
+
 var printToTerminalAttributes = map[int]*Node3{}
 
 const (
-	isInputThresholdReached    = 0
-	waitingTillRequestSucceeds = 1
-	reachTargetTime            = 2
-	before                     = 3
-	after                      = 4
-	computeWaitTimeDuration    = 5
-	targetTimeIsNotReached     = 6
-	targetTimeIsReached        = 7
-	requestFailed              = 8
-	requestSucceeded           = 9
+	a                             = 0
+	b0                            = 1
+	b1                            = 2
+	before                        = 3
+	after                         = 4
+	computeWaitTimeDuration       = 5
+	targetTimeIsNotReached        = 6
+	targetTimeIsReached           = 7
+	requestFailed                 = 8
+	requestSucceeded              = 9
+	NoNextNode                    = -1
+	loopOverSequence              = 0
+	processItem                   = 1
+	startPrediction               = 2
+	itemIsNew                     = 3
+	itemIsKnown                   = 4
+	predictNextItem               = 5
+	saveNewItem                   = 6
+	insertKnownItemIntoPrediction = 7
 )
 
 var printToTerminalTree = map[int]*Node3{
-	isInputThresholdReached:    {name: "isInputThresholdReached", nextNodeId: waitingTillRequestSucceeds},
-	waitingTillRequestSucceeds: {name: "waitingTillRequestSucceeds", nextNodeId: requestSucceeded, childrenNodeIds: []int{reachTargetTime, requestSucceeded}},
-	reachTargetTime:            {name: "reachTargetTime", nextNodeId: requestFailed, childrenNodeIds: []int{before, targetTimeIsReached}},
-	before:                     {name: "before", nextNodeId: after},
-	after:                      {name: "after", nextNodeId: computeWaitTimeDuration},
-	computeWaitTimeDuration:    {name: "computeWaitTimeDuration", nextNodeId: targetTimeIsNotReached},
-	targetTimeIsNotReached:     {name: "targetTimeIsNotReached", nextNodeId: before},
-	targetTimeIsReached:        {name: "targetTimeIsReached"},
-	requestFailed:              {name: "requestFailed", nextNodeId: before},
-	requestSucceeded:           {name: "requestSucceeded"},
+	a:                       {name: "a", nextNodeId: b0},
+	b0:                      {name: "b0", nextNodeId: targetTimeIsNotReached, childrenNodeIds: []int{b0, b1}},
+	b1:                      {name: "b1", nextNodeId: requestFailed, childrenNodeIds: []int{before, targetTimeIsReached}},
+	before:                  {name: "before", nextNodeId: after},
+	after:                   {name: "after", nextNodeId: computeWaitTimeDuration},
+	computeWaitTimeDuration: {name: "computeWaitTimeDuration", nextNodeId: targetTimeIsNotReached},
+	targetTimeIsNotReached:  {name: "targetTimeIsNotReached", nextNodeId: before},
+	targetTimeIsReached:     {name: "targetTimeIsReached", nextNodeId: NoNextNode},
+	requestFailed:           {name: "requestFailed", nextNodeId: before},
+	requestSucceeded:        {name: "requestSucceeded", nextNodeId: NoNextNode},
 }
 
 var x1 = map[int]*Node3{
@@ -253,6 +263,12 @@ var X1 = func(x map[int]*Node3, controlFlowNodeId int, dataNodeId *int) int {
 	*dataNodeId = x[*dataNodeId].variables["containerVarName"]
 	return 1
 }
+var returnTrue = func(x map[int]*Node3, controlFlowNodeId int, dataNodeId *int) int {
+	return 1
+}
+var returnFalse = func(x map[int]*Node3, controlFlowNodeId int, dataNodeId *int) int {
+	return 0
+}
 
 func structAttributeExists(s interface{}, attributeName string) bool {
 	v := reflect.ValueOf(s)
@@ -273,7 +289,7 @@ func traverseX1(
 	for functionPassCount > 0 {
 		functionPassCount = 0
 		item := x1[id]
-		isChild := structAttributeExists(item, "children")
+		isChild := len((*item).childrenNodeIds) > 0
 		if !isChild {
 			before := functionPassCount
 			functionPassCount += item.function(x1, id, dataNodeId)
