@@ -132,8 +132,9 @@ type NextNode struct {
 }
 
 type Node3 struct {
-	id   int
-	name string
+	id            int
+	name          string
+	parentNodeIds []int
 	// nil if len(childrenNodes) > 0
 	function       func(x map[int]*Node3, controlFlowNodeId int, dataNodeId *int) int
 	functionPassed bool
@@ -190,25 +191,28 @@ const (
 var printToTerminalAttributes = map[int]*Node3{}
 
 const (
-	a                             = 0
-	b0                            = 1
-	b1                            = 2
-	before                        = 3
-	after                         = 4
-	computeWaitTimeDuration       = 5
-	targetTimeIsNotReached        = 6
-	targetTimeIsReached           = 7
-	requestFailed                 = 8
-	requestSucceeded              = 9
-	NoNextNode                    = -1
-	loopOverSequence              = 0
-	processItem                   = 1
-	startPrediction               = 2
-	itemIsNew                     = 3
-	itemIsKnown                   = 4
-	predictNextItem               = 5
-	saveNewItem                   = 6
-	insertKnownItemIntoPrediction = 7
+	a                            = 0
+	b0                           = 1
+	b1                           = 2
+	before                       = 3
+	after                        = 4
+	computeWaitTimeDuration      = 5
+	targetTimeIsNotReached       = 6
+	targetTimeIsReached          = 7
+	requestFailed                = 8
+	requestSucceeded             = 9
+	NoNextNode                   = -1
+	loopOverSequence             = 0
+	processItem                  = 1
+	startPrediction              = 2
+	itemIsNew                    = 3
+	itemIsKnown                  = 4
+	predictNextItem              = 5
+	saveNewItem                  = 6
+	addNewItemToOutputPrediction = 7
+	inputSequence                = 8
+	predictionSequence           = 9
+	savedOutputSequence          = 10
 )
 
 var printToTerminalTree = map[int]*Node3{
