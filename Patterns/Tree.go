@@ -156,29 +156,28 @@ graphical nodes across and their distances
 
 a
 \→ b0 ←←←←←←←←←
-   \→ c0      ↑
-      ↻\→ d0 ←↑←
-          ↓   ↑↑
-          e0 →↑↑
-   \→ c1       ↑
-	  ↓\→ d1 →→↑
-	  ↓	  ↓
-	  ↓   e1
-	  ↓\→ d3
-	  ↓   ↓
-	  ↓   e0
-	  c2
-	  ↓
-	  b0
-	  ↓
-	  e0
-	  ↓
-	  c3
-   \→ e0
+
+	   \→ c0      ↑
+	      ↻\→ d0 ←↑←
+	          ↓   ↑↑
+	          e0 →↑↑
+	   \→ c1       ↑
+		  ↓\→ d1 →→↑
+		  ↓	  ↓
+		  ↓   e1
+		  ↓\→ d3
+		  ↓   ↓
+		  ↓   e0
+		  c2
+		  ↓
+		  b0
+		  ↓
+		  e0
+		  ↓
+		  c3
+	   \→ e0
+
 \→ b1
-
-
-
 */
 
 const (
@@ -188,7 +187,13 @@ const (
 	// node maps to sequence of edge kinds horizontally from other nodes
 )
 
-var printToTerminalAttributes = map[int]*Node3{}
+const (
+	characterToId = 0
+)
+
+var storeAndReuseAttributes = map[int]*Node3{
+	characterToId: {name: "characterToId", variables: map[string]int{}},
+}
 
 const (
 	a                            = 0
@@ -215,7 +220,7 @@ const (
 	savedOutputSequence          = 10
 )
 
-var printToTerminalTree = map[int]*Node3{
+var storeAndReuseTree = map[int]*Node3{
 	a:                       {name: "a", nextNodeId: b0},
 	b0:                      {name: "b0", nextNodeId: targetTimeIsNotReached, childrenNodeIds: []int{b0, b1}},
 	b1:                      {name: "b1", nextNodeId: requestFailed, childrenNodeIds: []int{before, targetTimeIsReached}},
