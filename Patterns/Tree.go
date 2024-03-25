@@ -236,16 +236,18 @@ const (
 )
 
 var storeAndReuseTree = map[int]*Node3{
-	a:                       {name: "a", nextNodeId: b0},
-	b0:                      {name: "b0", nextNodeId: targetTimeIsNotReached, childrenNodeIds: []int{b0, b1}},
-	b1:                      {name: "b1", nextNodeId: requestFailed, childrenNodeIds: []int{before, targetTimeIsReached}},
-	before:                  {name: "before", nextNodeId: after},
-	after:                   {name: "after", nextNodeId: computeWaitTimeDuration},
-	computeWaitTimeDuration: {name: "computeWaitTimeDuration", nextNodeId: targetTimeIsNotReached},
-	targetTimeIsNotReached:  {name: "targetTimeIsNotReached", nextNodeId: before},
-	targetTimeIsReached:     {name: "targetTimeIsReached", nextNodeId: NoNextNode},
-	requestFailed:           {name: "requestFailed", nextNodeId: before},
-	requestSucceeded:        {name: "requestSucceeded", nextNodeId: NoNextNode},
+	loopOverSequence: {name: "loopOverSequence", childrenNodeIds: []int{processItem}},
+	processItem:      {name: "processItem", childrenNodeIds: []int{}},
+	// a:                       {name: "a", nextNodeId: b0},
+	// b0:                      {name: "b0", nextNodeId: targetTimeIsNotReached, childrenNodeIds: []int{b0, b1}},
+	// b1:                      {name: "b1", nextNodeId: requestFailed, childrenNodeIds: []int{before, targetTimeIsReached}},
+	// before:                  {name: "before", nextNodeId: after},
+	// after:                   {name: "after", nextNodeId: computeWaitTimeDuration},
+	// computeWaitTimeDuration: {name: "computeWaitTimeDuration", nextNodeId: targetTimeIsNotReached},
+	// targetTimeIsNotReached:  {name: "targetTimeIsNotReached", nextNodeId: before},
+	// targetTimeIsReached:     {name: "targetTimeIsReached", nextNodeId: NoNextNode},
+	// requestFailed:           {name: "requestFailed", nextNodeId: before},
+	// requestSucceeded:        {name: "requestSucceeded", nextNodeId: NoNextNode},
 }
 
 var x1 = map[int]*Node3{
