@@ -188,24 +188,25 @@ const (
 )
 
 const (
-	characterToId = 0
-	ids1          = 1
-	ids2          = 2
-	input         = 3
+	characterToId      = 0
+	ids1               = 1
+	ids2               = 2
+	input              = 3
+	newItemStreakCount = 4
 )
 
-var storeAndReuseAttributes = map[int]*Node3{
+var reuseAttributes = map[int]*Node3{
 	characterToId: {name: "characterToId", variables: map[string]int{}},
 	ids1:          {name: "ids1", variableCollection: []int{}},
 	ids2:          {name: "ids2", variableCollection: []int{}},
 	input:         {name: "input", variableCollection: []int{}},
 }
 
-func loadInput(inputString string, storeAndReuseAttributes map[int]*Node3) {
-	nextId := len(storeAndReuseAttributes)
+func loadInput(inputString string, reuseAttributes map[int]*Node3) {
+	nextId := len(reuseAttributes)
 	for _, char := range inputString {
-		storeAndReuseAttributes[nextId] = &Node3{name: string(char)}
-		storeAndReuseAttributes[input].variableCollection = append(storeAndReuseAttributes[input].variableCollection, nextId)
+		reuseAttributes[nextId] = &Node3{name: string(char)}
+		reuseAttributes[input].variableCollection = append(reuseAttributes[input].variableCollection, nextId)
 		nextId += 1
 	}
 }
@@ -235,9 +236,10 @@ const (
 	savedOutputSequence          = 10
 )
 
-var storeAndReuseTree = map[int]*Node3{
+var reuseTree = map[int]*Node3{
 	loopOverSequence: {name: "loopOverSequence", childrenNodeIds: []int{processItem}},
-	processItem:      {name: "processItem", childrenNodeIds: []int{}},
+	processItem:      {name: "processItem", childrenNodeIds: []int{itemIsKnown, itemIsNew}},
+	itemIsKnown:      {name: "itemIsKnown", childrenNodeIds: []int{}},
 	// a:                       {name: "a", nextNodeId: b0},
 	// b0:                      {name: "b0", nextNodeId: targetTimeIsNotReached, childrenNodeIds: []int{b0, b1}},
 	// b1:                      {name: "b1", nextNodeId: requestFailed, childrenNodeIds: []int{before, targetTimeIsReached}},
