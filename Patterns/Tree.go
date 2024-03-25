@@ -189,10 +189,25 @@ const (
 
 const (
 	characterToId = 0
+	ids1          = 1
+	ids2          = 2
+	input         = 3
 )
 
 var storeAndReuseAttributes = map[int]*Node3{
 	characterToId: {name: "characterToId", variables: map[string]int{}},
+	ids1:          {name: "ids1", variableCollection: []int{}},
+	ids2:          {name: "ids2", variableCollection: []int{}},
+	input:         {name: "input", variableCollection: []int{}},
+}
+
+func loadInput(inputString string, storeAndReuseAttributes map[int]*Node3) {
+	nextId := len(storeAndReuseAttributes)
+	for _, char := range inputString {
+		storeAndReuseAttributes[nextId] = &Node3{name: string(char)}
+		storeAndReuseAttributes[input].variableCollection = append(storeAndReuseAttributes[input].variableCollection, nextId)
+		nextId += 1
+	}
 }
 
 const (
