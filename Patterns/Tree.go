@@ -188,11 +188,12 @@ const (
 )
 
 const (
-	characterToId      = 0
-	ids1               = 1
-	ids2               = 2
-	input              = 3
-	newItemStreakCount = 4
+	characterToId                = 0
+	ids1                         = 1
+	ids2                         = 2
+	input                        = 3
+	newItemStreakCount           = 4
+	useFrequencyPercentThreshold = 5
 )
 
 var reuseAttributes = map[int]*Node3{
@@ -202,6 +203,15 @@ var reuseAttributes = map[int]*Node3{
 	input:         {name: "input", variableCollection: []int{}},
 }
 
+// inputs
+/*
+111000101010
+01010100110
+010101101010
+
+items saved
+1, 0, 10, 01
+*/
 func loadInput(inputString string, reuseAttributes map[int]*Node3) {
 	nextId := len(reuseAttributes)
 	for _, char := range inputString {
@@ -228,6 +238,7 @@ const (
 	startPrediction              = 2
 	itemIsNew                    = 3
 	itemIsKnown                  = 4
+	itemIsUsedOften              = 11
 	predictNextItem              = 5
 	saveNewItem                  = 6
 	addNewItemToOutputPrediction = 7
@@ -239,7 +250,7 @@ const (
 var reuseTree = map[int]*Node3{
 	loopOverSequence: {name: "loopOverSequence", childrenNodeIds: []int{processItem}},
 	processItem:      {name: "processItem", childrenNodeIds: []int{itemIsKnown, itemIsNew}},
-	itemIsKnown:      {name: "itemIsKnown", childrenNodeIds: []int{}},
+	itemIsKnown:      {name: "itemIsKnown", childrenNodeIds: []int{itemIsUsedOften}},
 	// a:                       {name: "a", nextNodeId: b0},
 	// b0:                      {name: "b0", nextNodeId: targetTimeIsNotReached, childrenNodeIds: []int{b0, b1}},
 	// b1:                      {name: "b1", nextNodeId: requestFailed, childrenNodeIds: []int{before, targetTimeIsReached}},
