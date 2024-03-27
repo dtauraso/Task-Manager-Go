@@ -143,8 +143,8 @@ type Node3 struct {
 	dataNodeName    string
 	// only 1 next
 	nextNodeId int
-	// n children to try
-	childrenNodeIds []int
+	// n directions to try
+	directionNodeIds []int
 
 	value              int
 	variables          map[string]int
@@ -210,7 +210,7 @@ var reuseAttributes = map[int]*Node3{
 010101101010
 
 items saved
-1, 0, 10, 01
+1, 0, 10, 01, 010101101010
 */
 func loadInput(inputString string, reuseAttributes map[int]*Node3) {
 	nextId := len(reuseAttributes)
@@ -248,9 +248,9 @@ const (
 )
 
 var reuseTree = map[int]*Node3{
-	loopOverSequence: {name: "loopOverSequence", childrenNodeIds: []int{processItem}},
-	processItem:      {name: "processItem", childrenNodeIds: []int{itemIsKnown, itemIsNew}},
-	itemIsKnown:      {name: "itemIsKnown", childrenNodeIds: []int{itemIsUsedOften}},
+	loopOverSequence: {name: "loopOverSequence", directionNodeIds: []int{processItem}},
+	processItem:      {name: "processItem", directionNodeIds: []int{itemIsKnown, itemIsNew}},
+	itemIsKnown:      {name: "itemIsKnown", directionNodeIds: []int{itemIsUsedOften}},
 	// a:                       {name: "a", nextNodeId: b0},
 	// b0:                      {name: "b0", nextNodeId: targetTimeIsNotReached, childrenNodeIds: []int{b0, b1}},
 	// b1:                      {name: "b1", nextNodeId: requestFailed, childrenNodeIds: []int{before, targetTimeIsReached}},
@@ -267,7 +267,7 @@ var x1 = map[int]*Node3{
 	0: {},
 	1: {name: "", function: X, nextNodeId: 3},
 	3: {name: "x0", function: nil, nextNodeId: 4,
-		childrenNodeIds: []int{5}},
+		directionNodeIds: []int{5}},
 	4: {name: "n0"},
 	5: {name: "x1", function: X1},
 	6: {name: "dataModel",
@@ -328,7 +328,7 @@ func traverseX1(
 	for functionPassCount > 0 {
 		functionPassCount = 0
 		item := x1[id]
-		isChild := len((*item).childrenNodeIds) > 0
+		isChild := len((*item).directionNodeIds) > 0
 		if !isChild {
 			before := functionPassCount
 			functionPassCount += item.function(x1, id, dataNodeId)
@@ -337,7 +337,7 @@ func traverseX1(
 				item.functionPassed = true
 			}
 		} else if isChild {
-			children := item.childrenNodeIds
+			children := item.directionNodeIds
 			for key := range children {
 				before := functionPassCount
 				functionPassCount += traverseX1(x1, key, dataNodeId)
