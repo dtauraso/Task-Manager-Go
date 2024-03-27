@@ -224,39 +224,41 @@ func loadInput(inputString string, reuseAttributes map[int]*Node3) {
 }
 
 const (
-	a                                  = 0
-	b0                                 = 1
-	b1                                 = 2
-	before                             = 3
-	after                              = 4
-	computeWaitTimeDuration            = 5
-	targetTimeIsNotReached             = 6
-	targetTimeIsReached                = 7
-	requestFailed                      = 8
-	requestSucceeded                   = 9
-	NoNextNode                         = -1
-	loopOverSequence                   = 0
-	processItem                        = 1
-	startPrediction                    = 2
-	itemIsNew                          = 3
-	itemIsKnown                        = 4
-	itemIsUsedOften                    = 11
-	predictNextItem                    = 5
-	saveNewItem                        = 6
-	addNewItemToOutputPrediction       = 7
-	inputSequence                      = 8
-	predictionSequence                 = 9
-	savedOutputSequence                = 10
-	currentItemStartsExistingPattern   = 12
-	currentItemStartsPatternInProgress = 13
+	a                                             = 0
+	b0                                            = 1
+	b1                                            = 2
+	before                                        = 3
+	after                                         = 4
+	computeWaitTimeDuration                       = 5
+	targetTimeIsNotReached                        = 6
+	targetTimeIsReached                           = 7
+	requestFailed                                 = 8
+	requestSucceeded                              = 9
+	NoNextNode                                    = -1
+	loopOverSequence                              = 0
+	processItem                                   = 1
+	startPrediction                               = 2
+	itemIsNew                                     = 3
+	itemIsKnown                                   = 4
+	itemIsUsedOften                               = 11
+	predictNextItem                               = 5
+	saveNewItem                                   = 6
+	addNewItemToOutputPrediction                  = 7
+	inputSequence                                 = 8
+	predictionSequence                            = 9
+	savedOutputSequence                           = 10
+	currentItemStartsExistingPattern              = 12
+	currentItemStartsPatternInProgress            = 13
+	currentItemDoesNotStartNewAndExistingPatterns = 14
 )
 
 var reuseTree = map[int]*Node3{
-	loopOverSequence:                   {name: "loopOverSequence", directionNodeIds: []int{processItem}},
-	processItem:                        {name: "processItem", directionNodeIds: []int{itemIsKnown, itemIsNew}},
-	itemIsKnown:                        {name: "itemIsKnown", directionNodeIds: []int{currentItemStartsExistingPattern, currentItemStartsPatternInProgress}},
-	currentItemStartsExistingPattern:   {name: "currentItemStartsExistingPattern", directionNodeIds: []int{}},
-	currentItemStartsPatternInProgress: {name: "currentItemStartsPatternInProgress", directionNodeIds: []int{}},
+	loopOverSequence:                              {name: "loopOverSequence", directionNodeIds: []int{processItem}},
+	processItem:                                   {name: "processItem", directionNodeIds: []int{itemIsKnown, itemIsNew}},
+	itemIsKnown:                                   {name: "itemIsKnown", directionNodeIds: []int{currentItemStartsExistingPattern, currentItemStartsPatternInProgress, currentItemDoesNotStartNewAndExistingPatterns}},
+	currentItemStartsExistingPattern:              {name: "currentItemStartsExistingPattern", directionNodeIds: []int{}},
+	currentItemStartsPatternInProgress:            {name: "currentItemStartsPatternInProgress", directionNodeIds: []int{}},
+	currentItemDoesNotStartNewAndExistingPatterns: {name: "currentItemDoesNotStartNewAndExistingPatterns", directionNodeIds: []int{}},
 
 	// a:                       {name: "a", nextNodeId: b0},
 	// b0:                      {name: "b0", nextNodeId: targetTimeIsNotReached, childrenNodeIds: []int{b0, b1}},
