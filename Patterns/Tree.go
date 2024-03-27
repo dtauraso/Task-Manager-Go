@@ -194,10 +194,12 @@ const (
 	input                        = 3
 	newItemStreakCount           = 4
 	useFrequencyPercentThreshold = 5
+	idToCharacter                = 6
 )
 
 var reuseAttributes = map[int]*Node3{
 	characterToId: {name: "characterToId", variables: map[string]int{}},
+	idToCharacter: {name: "idToCharacter", variables: map[string]int{}},
 	ids1:          {name: "ids1", variableCollection: []int{}},
 	ids2:          {name: "ids2", variableCollection: []int{}},
 	input:         {name: "input", variableCollection: []int{}},
@@ -250,7 +252,7 @@ const (
 var reuseTree = map[int]*Node3{
 	loopOverSequence: {name: "loopOverSequence", directionNodeIds: []int{processItem}},
 	processItem:      {name: "processItem", directionNodeIds: []int{itemIsKnown, itemIsNew}},
-	itemIsKnown:      {name: "itemIsKnown", directionNodeIds: []int{itemIsUsedOften}},
+	itemIsKnown:      {name: "itemIsKnown", directionNodeIds: []int{}},
 	// a:                       {name: "a", nextNodeId: b0},
 	// b0:                      {name: "b0", nextNodeId: targetTimeIsNotReached, childrenNodeIds: []int{b0, b1}},
 	// b1:                      {name: "b1", nextNodeId: requestFailed, childrenNodeIds: []int{before, targetTimeIsReached}},
