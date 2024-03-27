@@ -189,8 +189,9 @@ const (
 
 const (
 	characterToId                = 0
-	ids1                         = 1
-	ids2                         = 2
+	sequenceCollection           = 1
+	sequenceElements             = 7
+	sequenceElementVersion       = 2
 	input                        = 3
 	newItemStreakCount           = 4
 	useFrequencyPercentThreshold = 5
@@ -198,11 +199,12 @@ const (
 )
 
 var reuseAttributes = map[int]*Node3{
-	characterToId: {name: "characterToId", variables: map[string]int{}},
-	idToCharacter: {name: "idToCharacter", variables: map[string]int{}},
-	ids1:          {name: "ids1", variableCollection: []int{}},
-	ids2:          {name: "ids2", variableCollection: []int{}},
-	input:         {name: "input", variableCollection: []int{}},
+	characterToId:          {name: "characterToId", variables: map[string]int{}},
+	idToCharacter:          {name: "idToCharacter", variables: map[string]int{}},
+	sequenceCollection:     {name: "sequenceCollection", variableCollection: []int{}},
+	sequenceElements:       {name: "sequenceElements", variableCollection: []int{}},
+	sequenceElementVersion: {name: "sequenceElementVersion", variableCollection: []int{}},
+	input:                  {name: "input", variableCollection: []int{}},
 }
 
 // inputs
