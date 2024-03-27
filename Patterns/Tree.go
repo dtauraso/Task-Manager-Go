@@ -256,7 +256,7 @@ var reuseTree = map[int]*Node3{
 	processItem:                        {name: "processItem", directionNodeIds: []int{itemIsKnown, itemIsNew}},
 	itemIsKnown:                        {name: "itemIsKnown", directionNodeIds: []int{currentItemStartsExistingPattern, currentItemStartsPatternInProgress}},
 	currentItemStartsExistingPattern:   {name: "currentItemStartsExistingPattern", directionNodeIds: []int{}},
-	currentItemStartsPatternInProgress: {name: "currentItemStartsSequence", directionNodeIds: []int{}},
+	currentItemStartsPatternInProgress: {name: "currentItemStartsPatternInProgress", directionNodeIds: []int{}},
 
 	// a:                       {name: "a", nextNodeId: b0},
 	// b0:                      {name: "b0", nextNodeId: targetTimeIsNotReached, childrenNodeIds: []int{b0, b1}},
