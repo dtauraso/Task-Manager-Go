@@ -189,7 +189,7 @@ const (
 
 const (
 	characterToId                = 0
-	sequenceCollection           = 1
+	sequenceStartIds             = 1
 	sequenceElements             = 7
 	sequenceElementVersion       = 2
 	input                        = 3
@@ -201,7 +201,7 @@ const (
 var reuseAttributes = map[int]*Node3{
 	characterToId:          {name: "characterToId", variables: map[string]int{}},
 	idToCharacter:          {name: "idToCharacter", variables: map[string]int{}},
-	sequenceCollection:     {name: "sequenceCollection", variableCollection: []int{}},
+	sequenceStartIds:       {name: "sequenceStartIds", variableCollection: []int{}},
 	sequenceElements:       {name: "sequenceElements", variableCollection: []int{}},
 	sequenceElementVersion: {name: "sequenceElementVersion", variableCollection: []int{}},
 	input:                  {name: "input", variableCollection: []int{}},
@@ -214,7 +214,9 @@ var reuseAttributes = map[int]*Node3{
 010101101010
 
 items saved
-1, 0, 10, 01, 010101101010
+1, 0, 10, 01
+
+
 */
 func loadInput(inputString string, reuseAttributes map[int]*Node3) {
 	nextId := len(reuseAttributes)
@@ -226,39 +228,58 @@ func loadInput(inputString string, reuseAttributes map[int]*Node3) {
 }
 
 const (
-	a                                             = 0
-	b0                                            = 1
-	b1                                            = 2
-	before                                        = 3
-	after                                         = 4
-	computeWaitTimeDuration                       = 5
-	targetTimeIsNotReached                        = 6
-	targetTimeIsReached                           = 7
-	requestFailed                                 = 8
-	requestSucceeded                              = 9
-	NoNextNode                                    = -1
-	loopOverSequence                              = 0
-	processItem                                   = 1
-	startPrediction                               = 2
-	itemIsNew                                     = 3
-	itemIsKnown                                   = 4
-	itemIsUsedOften                               = 11
-	predictNextItem                               = 5
-	saveNewItem                                   = 6
-	addNewItemToOutputPrediction                  = 7
-	inputSequence                                 = 8
-	predictionSequence                            = 9
-	savedOutputSequence                           = 10
-	currentItemStartsExistingPattern              = 12
-	currentItemStartsPatternInProgress            = 13
-	currentItemDoesNotStartNewAndExistingPatterns = 14
+	a                                                               = 0
+	b0                                                              = 1
+	b1                                                              = 2
+	before                                                          = 3
+	after                                                           = 4
+	computeWaitTimeDuration                                         = 5
+	targetTimeIsNotReached                                          = 6
+	targetTimeIsReached                                             = 7
+	requestFailed                                                   = 8
+	requestSucceeded                                                = 9
+	NoNextNode                                                      = -1
+	loopOverSequence                                                = 0
+	processItem                                                     = 1
+	startPrediction                                                 = 2
+	itemIsNew                                                       = 3
+	itemIsKnown                                                     = 4
+	itemIsUsedOften                                                 = 11
+	predictNextItem                                                 = 5
+	saveNewItem                                                     = 6
+	addNewItemToOutputPrediction                                    = 7
+	inputSequence                                                   = 8
+	predictionSequence                                              = 9
+	savedOutputSequence                                             = 10
+	currentItemStartsExistingPattern                                = 12
+	currentItemStartsExistingPatternL2                              = 15
+	currentItemStartsPatternInProgress                              = 13
+	currentItemDoesNotStartNewAndExistingPatterns                   = 14
+	patternInProgressIsEmpty                                        = 16
+	patternInProgressIsNotEmpty                                     = 19
+	appendToPatternInProgress                                       = 17
+	appendToPatternInProgress2                                      = 20
+	setupStartTrackersForExistingPatterns                           = 18
+	markItemAsVisited                                               = 21
+	autoCompleteIfItemStartsGroup                                   = 27
+	autoCompleteDoesNotFinish                                       = 28
+	trackLastItemVisited                                            = 22
+	connectLastItemVisitedToCurrentItemVisitedSecondTime            = 23
+	groupItemsBeingConnected                                        = 24
+	stopConnectIfCurrentItemIsVisitedThirdTime                      = 25
+	unvisitMembersOfGroupAndVisitOnlyTheGroupIdAndMarkAsLastVisited = 26
 )
 
 var reuseTree = map[int]*Node3{
 	loopOverSequence:                              {name: "loopOverSequence", directionNodeIds: []int{processItem}},
 	processItem:                                   {name: "processItem", directionNodeIds: []int{itemIsKnown, itemIsNew}},
-	itemIsKnown:                                   {name: "itemIsKnown", directionNodeIds: []int{currentItemStartsExistingPattern, currentItemStartsPatternInProgress, currentItemDoesNotStartNewAndExistingPatterns}},
-	currentItemStartsExistingPattern:              {name: "currentItemStartsExistingPattern", directionNodeIds: []int{}},
+	itemIsKnown:                                   {name: "itemIsKnown", directionNodeIds: []int{patternInProgressIsEmpty, patternInProgressIsNotEmpty}},
+	patternInProgressIsEmpty:                      {name: "patternInProgressIsEmpty", nextNodeId: appendToPatternInProgress, directionNodeIds: []int{}},
+	patternInProgressIsNotEmpty:                   {name: "patternInProgressIsNotEmpty", nextNodeId: appendToPatternInProgress2, directionNodeIds: []int{}},
+	appendToPatternInProgress:                     {name: "appendToPatternInProgress", nextNodeId: setupStartTrackersForExistingPatterns, directionNodeIds: []int{}},
+	appendToPatternInProgress2:                    {name: "appendToPatternInProgress2", nextNodeId: -1, directionNodeIds: []int{}},
+	setupStartTrackersForExistingPatterns:         {name: "setupStartTrackersForExistingPatterns", directionNodeIds: []int{}},
+	currentItemStartsExistingPattern:              {name: "currentItemStartsExistingPattern", directionNodeIds: []int{currentItemStartsExistingPatternL2}},
 	currentItemStartsPatternInProgress:            {name: "currentItemStartsPatternInProgress", directionNodeIds: []int{}},
 	currentItemDoesNotStartNewAndExistingPatterns: {name: "currentItemDoesNotStartNewAndExistingPatterns", directionNodeIds: []int{}},
 
