@@ -292,7 +292,7 @@ func (sh *SequenceHierarchy) Categorize2(newSequence *[]*Node1) {
 	fmt.Printf("%v\n", x)
 
 	nodeIdSize := map[int]int{}
-	for nodeId, _ := range x {
+	for nodeId := range x {
 		nodeIdSize[nodeId] = 1
 	}
 	atBeginingCount := 0
@@ -421,7 +421,7 @@ func (sh *SequenceHierarchy) Categorize() {
 	fmt.Printf("%v\n", x)
 
 	nodeIdSize := map[int]int{}
-	for nodeId, _ := range x {
+	for nodeId := range x {
 		nodeIdSize[nodeId] = 1
 	}
 	atBeginingCount := 0
@@ -750,7 +750,7 @@ func Pattern() {
 		fmt.Printf("%v\n", item)
 	}
 	fmt.Printf("\n")
-	return
+	// return
 	sh.CreateSequenceOfOperationChangeNames(&item1, &caretaker, itemSequence1)
 	// fmt.Printf("here\n")
 	// for _, item := range nodes {
@@ -776,7 +776,7 @@ func Pattern() {
 		fmt.Printf("%v: %v\n", operationName, item)
 	}
 	fmt.Printf("%v\n", sh.FirstNodeIdLastSequenceAdded)
-	for nodeIds, _ := range sh.NodeIdsLastSequenceAdded {
+	for nodeIds := range sh.NodeIdsLastSequenceAdded {
 		fmt.Printf("%v, ", nodeIds)
 	}
 	fmt.Printf("\n")
@@ -802,7 +802,7 @@ func Pattern() {
 		fmt.Printf("%v: %v\n", operationName, item)
 	}
 	fmt.Printf("%v\n", sh.FirstNodeIdLastSequenceAdded)
-	for nodeIds, _ := range sh.NodeIdsLastSequenceAdded {
+	for nodeIds := range sh.NodeIdsLastSequenceAdded {
 		fmt.Printf("%v, ", nodeIds)
 	}
 	fmt.Printf("\n")
